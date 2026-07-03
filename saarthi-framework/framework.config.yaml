@@ -44,8 +44,7 @@ environment_profiles:
 # ---------------------------------------------------------------------------
 # MCP Servers & Capabilities (Tool Integration)
 # Define expected tools. The framework will instruct agents to use these natively.
-# If a tool is missing and the user is non-technical, the agent will self-onboard
-# it by prompting the user for necessary credentials.
+# If a tool is missing, guide the user to configure credentials in their environment/secret manager (never paste tokens into chat).
 # Users can manually add any custom MCP here to grant roles new powers.
 # ---------------------------------------------------------------------------
 mcp_servers:
