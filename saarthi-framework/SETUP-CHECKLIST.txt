@@ -1,0 +1,138 @@
+MISSION CONTROL FRAMEWORK SETUP CHECKLIST (NO GITHUB SYNC)
+
+Purpose
+- Set up सारथी (Saarthi) on any VS Code installation without requiring framework files in coding repositories.
+- Keep a centralized local framework source-of-truth in the VS Code user prompts area.
+
+--------------------------------------------------------------------
+1) Pre-requisites
+--------------------------------------------------------------------
+- Install VS Code.
+- Install Node.js.
+- Install GitHub Copilot extension and sign in.
+
+--------------------------------------------------------------------
+2) Find or create the VS Code user prompts folder
+--------------------------------------------------------------------
+Typical locations:
+- Windows: %APPDATA%\Code\User\prompts
+- macOS: ~/Library/Application Support/Code/User/prompts
+- Linux: ~/.config/Code/User/prompts
+
+If missing, create the prompts folder.
+
+Define:
+- <user-prompts-root> = the folder above
+- <framework-home> = <user-prompts-root>/saarthi-framework
+
+--------------------------------------------------------------------
+3) Copy required files into user prompts
+--------------------------------------------------------------------
+Copy these into <user-prompts-root>:
+- saarthi.agent.md
+- work-item-kickoff.prompt.md
+- saarthi-publish-to-central.prompt.md
+- pilot-checklist.prompt.md (optional)
+- saarthi-framework/ (entire folder tree)
+
+--------------------------------------------------------------------
+4) Reload and verify discovery
+--------------------------------------------------------------------
+- In VS Code, run: Developer: Reload Window
+- Open Copilot Chat.
+- Confirm the custom agent सारथी (Saarthi) appears.
+- Confirm slash prompts are discoverable:
+  - /work-item-kickoff
+  - /saarthi-publish-to-central
+
+Note: selecting सारथी (Saarthi) does NOT auto-populate a starter prompt.
+Use /work-item-kickoff explicitly.
+
+--------------------------------------------------------------------
+5) Validate framework health (one-time)
+--------------------------------------------------------------------
+From terminal:
+
+Windows PowerShell:
+node "<framework-home>\tools\smoke-test-framework.js" --root "<framework-home>"
+
+macOS/Linux:
+node "<framework-home>/tools/smoke-test-framework.js" --root "<framework-home>"
+
+Expected result: SMOKE TEST PASSED
+
+--------------------------------------------------------------------
+6) Daily usage model
+--------------------------------------------------------------------
+- Open any coding repo as usual.
+- In Copilot Chat, explicitly select सारथी (Saarthi).
+- Start work with /work-item-kickoff (or free-form request).
+- Code changes happen in the active coding repository.
+- Framework artifacts are centralized in:
+  <framework-home>/work-items/<WORK_ITEM_ID>/
+
+Work Item ID behavior:
+- If user provides ID: use it.
+- If missing: auto-generate WI-YYYYMMDD-short-title and create folder automatically.
+
+--------------------------------------------------------------------
+7) Publish framework updates from a working copy to source-of-truth
+--------------------------------------------------------------------
+Recommended: use publish scripts in <framework-home>/tools.
+
+A) Windows (PowerShell):
+powershell -ExecutionPolicy Bypass -File "<framework-home>\tools\publish-framework.ps1" -SourcePath "<working-copy-path>"
+
+B) Windows (CMD):
+"<framework-home>\tools\publish-framework.bat" "<working-copy-path>"
+
+C) macOS/Linux (bash):
+bash "<framework-home>/tools/publish-framework.sh" "<working-copy-path>" "<framework-home>"
+
+D) macOS/Linux (zsh):
+zsh "<framework-home>/tools/publish-framework.zsh" "<working-copy-path>" "<framework-home>"
+
+Guardrails in publish scripts:
+- If source structure similarity is below threshold, script asks for explicit YES confirmation.
+- Force override is available for intentional exceptions:
+  - PowerShell: -Force
+  - bat/bash/zsh: --force
+
+Post-publish behavior:
+- Scripts run smoke test automatically.
+- If smoke helper is missing, scripts run fallback validator help check.
+- Non-zero exit indicates publish or smoke-check failure.
+
+--------------------------------------------------------------------
+8) Pre-done validation for each work item
+--------------------------------------------------------------------
+Before accepting Done, run:
+
+node "<framework-home>/tools/validate-work-item.js" <WORK_ITEM_ID> --root "<framework-home>"
+
+Require exit code 0.
+
+--------------------------------------------------------------------
+9) Recommended source-control pattern
+--------------------------------------------------------------------
+- Keep one framework repo as your editable working copy.
+- Publish to <framework-home> after approved changes.
+- Optionally commit from working copy and tag versions.
+- Treat <framework-home> as local runtime source-of-truth for सारथी (Saarthi).
+
+--------------------------------------------------------------------
+10) Troubleshooting quick checks
+--------------------------------------------------------------------
+- सारथी (Saarthi) missing in chat:
+  - Ensure saarthi.agent.md is in <user-prompts-root>
+  - Reload VS Code window
+- Prompt missing:
+  - Ensure *.prompt.md exists in <user-prompts-root>
+  - Reload VS Code window
+- Publish failed by guardrail:
+  - Re-check SourcePath; confirm it is the intended framework root
+- Validator/smoke failure:
+  - Check required files in <framework-home>
+  - Re-run publish from a correct working copy
+
+END

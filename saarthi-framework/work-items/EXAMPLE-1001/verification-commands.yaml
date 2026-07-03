@@ -1,0 +1,23 @@
+# verification-commands.yaml
+# One-time, per-work-item cache of discovered verification commands.
+# (Illustrative values for the EXAMPLE-1001 few-shot work item.)
+
+work_item_id: "EXAMPLE-1001"
+discovered_at: "2026-06-30"
+project_type: "node+typescript"
+package_manager: "npm"
+
+commands:
+  install: "npm ci"
+  build: "npm run build"
+  lint: "npm run lint"
+  typecheck: "npm run typecheck"
+  unit_tests: "npm test"
+  integration_tests: "npm run test:integration"
+  coverage: "npm run test:coverage"
+  secret_scan: "gitleaks detect --no-banner"
+
+discovery_notes:
+  source: "package.json scripts; secret_scan from .github/workflows/ci.yml"
+  unresolved_steps: []
+  confirmed_by_user: true

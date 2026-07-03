@@ -1,0 +1,35 @@
+# verification-commands.yaml
+# ONE-TIME, per-work-item cache of the project's real verification commands.
+#
+# The agent creates this file once, when a work item is first initialized, by
+# discovering commands from the project (package.json, Makefile, pyproject,
+# build files, CI config, README, etc.). On later turns it READS this file
+# instead of re-discovering. See framework.config.yaml -> verification.discovery.
+#
+# Rules:
+#   - Leave a command empty ("") if the project has no such step; it is then
+#     treated as not-applicable and skipped by gates (not failed).
+#   - Refresh only when tooling changes or a cached command no longer exists.
+#   - These commands feed _framework/13-execution-verification-loop.md and the
+#     gates in _framework/05-quality-gates.md.
+
+work_item_id: "<WORK_ITEM_ID>"
+discovered_at: "<YYYY-MM-DD>"
+project_type: "<e.g. node+typescript / python / java-maven / go / mixed>"
+package_manager: "<e.g. npm / pnpm / yarn / pip / poetry / maven / gradle / cargo / go>"
+
+commands:
+  install: ""            # e.g. "npm ci"
+  build: ""              # e.g. "npm run build"
+  lint: ""               # e.g. "npm run lint"
+  typecheck: ""          # e.g. "npm run typecheck"
+  unit_tests: ""         # e.g. "npm test"
+  integration_tests: ""  # e.g. "npm run test:integration"
+  coverage: ""           # e.g. "npm run test:coverage"
+  secret_scan: ""        # e.g. "gitleaks detect --no-banner"
+
+# Where each command was found, for traceability and easy refresh.
+discovery_notes:
+  source: "<e.g. package.json scripts; Makefile targets; CI workflow>"
+  unresolved_steps: []   # steps with no command found (treated as not-applicable)
+  confirmed_by_user: false

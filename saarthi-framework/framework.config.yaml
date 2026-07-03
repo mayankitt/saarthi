@@ -1,0 +1,279 @@
+# framework.config.yaml
+# Machine-readable control plane for the AI Agent Framework.
+#
+# This file is the SINGLE SOURCE OF TRUTH for:
+#   - workflow mode -> leads -> artifacts -> question budget
+#   - model tier -> model selection policy
+#   - per-mode token/cost budgets and stop-and-report thresholds
+#   - machine-checkable Definition of Done (DoD)
+#   - how verification commands are discovered and cached (not hard-coded)
+#
+# The markdown docs under _framework/ explain the intent in human language.
+# When prose and this file disagree, THIS FILE WINS.
+#
+# How to adopt in a new repository:
+#   1. (Optional) Set `models.tier_map` hints, or leave `models.selection: auto`
+#      to let the orchestrator pick the appropriate model per tier.
+#   2. Do NOT hard-code build/test commands. They are auto-discovered once per
+#      work item and cached in work-items/<ID>/verification-commands.yaml.
+#   3. Adjust `definition_of_done.*` thresholds to your standards.
+#   4. Everything else can stay as shipped defaults.
+
+version: "0.4.0"
+
+# ---------------------------------------------------------------------------
+# Execution modes (how autonomous the agent should be)
+# ---------------------------------------------------------------------------
+autonomy:
+  default_level: "L2"
+  levels:
+    L1:
+      name: "Ask-often"
+      description: >
+        Confirm before each non-trivial action. Use for unfamiliar repos,
+        production-risk work, or when the user explicitly wants tight control.
+      confirm_before:
+        - any_file_write
+        - running_tests
+        - any_irreversible_action
+    L2:
+      name: "Act-and-checkpoint"
+      description: >
+        Default. Implement and verify autonomously within a single work item;
+        pause for confirmation at phase boundaries and before irreversible
+        actions. Record assumptions in the decision register.
+      confirm_before:
+        - irreversible_actions
+        - releasing_or_pushing
+        - weakening_security_controls
+    L3:
+      name: "Act-and-report"
+      description: >
+        Maximum autonomy. Implement, verify, and self-correct end to end;
+        report results after the fact. Only stops at hard safety rules and
+        budget thresholds. Requires a populated decision register for audit.
+      confirm_before:
+        - hard_safety_rule_triggers
+        - budget_threshold_exceeded
+
+# ---------------------------------------------------------------------------
+# Model tiers -> models.
+# selection: "auto"  -> the orchestrator picks the appropriate available model
+#                       per tier at runtime; tier_map values are treated as
+#                       PREFERRED HINTS, not fixed bindings.
+# selection: "fixed" -> always use exactly the tier_map values below.
+# ---------------------------------------------------------------------------
+models:
+  selection: "auto"
+  tier_map:
+    tier_1_light: "gpt-5.4-mini"        # e.g. small/fast model
+    tier_2_standard: "claude-haiku-4.5"  # e.g. balanced model
+    tier_3_heavy: "claude-sonnet-4.6"
+    tier_4_specialist: "claude-opus-4.8"  # e.g. expert-level model
+  rules:
+    - "Use the cheapest tier that can safely do the job."
+    - "Escalate only with a stated reason; de-escalate when the task simplifies."
+    - "Heavier tiers for design/review; lighter tiers for repetitive implementation."
+
+# ---------------------------------------------------------------------------
+# Workflow modes. Source of truth for leads / artifacts / budgets.
+# (02-workflow-modes.md explains these in prose.)
+# ---------------------------------------------------------------------------
+workflow_modes:
+  micro_task:
+    risk: low
+    question_budget: 3
+    response_size: compact
+    model_tier: tier_1_light
+    leads: [master_orchestrator, dev_lead, code_reviewer_if_code]
+    artifacts: [requirement-intake.md, work-item-summary.md]
+    dod_profile: light
+
+  small_task:
+    risk: low_medium
+    question_budget: 5
+    response_size: compact
+    model_tier: tier_2_standard
+    leads: [master_orchestrator, design_lead_light, dev_lead, qa_lead]
+    conditional_leads:
+      - { lead: security_lead, when: "access/data/security touched" }
+      - { lead: compliance_audit_lead, when: "audit-worthy actions touched" }
+    artifacts: [requirement-intake.md, clarification-log.md, implementation-plan.md, test-plan.md, work-item-summary.md]
+    dod_profile: standard
+
+  standard_feature:
+    risk: medium
+    question_budget: 7
+    response_size: standard
+    model_tier: tier_2_standard
+    leads: [master_orchestrator, product_lead, design_lead, dev_lead, qa_lead]
+    conditional_leads:
+      - { lead: security_lead, when: "security-relevant" }
+      - { lead: compliance_audit_lead, when: "audit-relevant" }
+      - { lead: observability_lead, when: "production-relevant" }
+      - { lead: devops_lead, when: "deployment risk" }
+    artifacts: [requirement-intake.md, clarification-log.md, product-spec.md, design-spec.md, implementation-plan.md, test-plan.md, work-item-summary.md]
+    dod_profile: standard
+
+  complex_feature:
+    risk: high
+    question_budget: 12
+    response_size: standard
+    model_tier: tier_3_heavy
+    leads: [master_orchestrator, product_lead, design_lead, dev_lead, qa_lead, security_lead, observability_lead]
+    conditional_leads:
+      - { lead: compliance_audit_lead, when: "audit/compliance-relevant" }
+      - { lead: devops_lead, when: "deployment risk" }
+    artifacts: [requirement-intake.md, clarification-log.md, product-spec.md, design-spec.md, implementation-plan.md, test-plan.md, observability-plan.md, work-item-summary.md]
+    conditional_artifacts:
+      - { artifact: security-review.md, when: "security-relevant" }
+      - { artifact: devops-release-plan.md, when: "deployment risk" }
+      - { artifact: audit-compliance-review.md, when: "audit/compliance-relevant" }
+    dod_profile: strict
+
+  high_risk_enterprise:
+    risk: critical
+    question_budget: 0   # 0 = no fixed limit; prioritize and group
+    response_size: detailed
+    model_tier: tier_3_heavy
+    review_tier: tier_4_specialist
+    leads: [master_orchestrator, product_lead, design_lead, security_lead, compliance_audit_lead, observability_lead, dev_lead, qa_lead]
+    conditional_leads:
+      - { lead: devops_lead, when: "release/deployment risk" }
+    artifacts: [requirement-intake.md, clarification-log.md, product-spec.md, design-spec.md, implementation-plan.md, test-plan.md, security-review.md, audit-compliance-review.md, observability-plan.md, work-item-summary.md]
+    conditional_artifacts:
+      - { artifact: devops-release-plan.md, when: "release/deployment risk" }
+    dod_profile: strict
+
+  prototype:
+    risk: explicit_only
+    question_budget: 5
+    response_size: standard
+    model_tier: tier_2_standard
+    assumptions_allowed: true
+    artifacts: [requirement-intake.md, work-item-summary.md]
+    dod_profile: prototype
+
+# ---------------------------------------------------------------------------
+# Token / cost budgets per mode, with a stop-and-report threshold.
+# Budgets are approximate guidance, not hard accounting. When the running
+# estimate crosses `stop_and_report_at`, the agent must pause, summarize
+# progress + remaining work + spend, and ask whether to continue.
+# ---------------------------------------------------------------------------
+budgets:
+  unit: "approx_tokens"
+  modes:
+    micro_task:           { soft_cap: 15000,  stop_and_report_at: 30000 }
+    small_task:           { soft_cap: 40000,  stop_and_report_at: 80000 }
+    standard_feature:     { soft_cap: 120000, stop_and_report_at: 220000 }
+    complex_feature:      { soft_cap: 300000, stop_and_report_at: 500000 }
+    high_risk_enterprise: { soft_cap: 500000, stop_and_report_at: 900000 }
+    prototype:            { soft_cap: 40000,  stop_and_report_at: 80000 }
+  rules:
+    - "Prefer summaries and references over re-dumping artifacts."
+    - "Load knowledge-base entries via knowledge-base/INDEX.md, not by reading everything."
+    - "On crossing stop_and_report_at, pause and ask before continuing."
+
+# ---------------------------------------------------------------------------
+# Verification commands are NOT hard-coded here, to keep the framework
+# project-agnostic. Instead, the agent DISCOVERS the project's real commands
+# ONCE when a work item is first initialized, and CACHES them in the work item
+# folder. Later turns READ the cache instead of re-discovering every time.
+#
+#   cache: work-items/<WORK_ITEM_ID>/verification-commands.yaml
+#
+# The execution-verification loop (13) and gates (05) consume the cached values.
+# ---------------------------------------------------------------------------
+verification:
+  discovery:
+    enabled: true
+    run_once_per_work_item: true
+    cache_file: "verification-commands.yaml"   # relative to work-items/<WORK_ITEM_ID>/
+    confirm_with_user: true   # show discovered commands once for confirmation before caching
+    # Where to look for commands, in priority order:
+    sources:
+      - "package.json scripts (npm / pnpm / yarn)"
+      - "Makefile / Taskfile.yml / justfile targets"
+      - "pyproject.toml / tox.ini / noxfile.py / setup.cfg (python)"
+      - "build.gradle(.kts) / pom.xml (gradle / maven)"
+      - "Cargo.toml (rust) / go.mod (go) / *.csproj (dotnet)"
+      - "CI config (.github/workflows, azure-pipelines.yml, .gitlab-ci.yml)"
+      - "README / CONTRIBUTING build & test sections"
+    # Steps to resolve a command for (any left unresolved are 'not-applicable'):
+    steps:
+      - install
+      - build
+      - lint
+      - typecheck
+      - unit_tests
+      - integration_tests
+      - coverage
+      - secret_scan
+    on_missing_command: >
+      Leave the step empty (treated as not-applicable / skipped). Only ask the
+      user for a command if a REQUIRED Definition-of-Done check needs it.
+    refresh_when:
+      - "User says the build/test tooling changed."
+      - "A cached command fails because it no longer exists (not a normal test failure)."
+  evidence_required: true   # gates require pasted command output, not self-report
+  max_fix_iterations: 5     # act->run->fix loop attempts before escalating to user
+
+# ---------------------------------------------------------------------------
+# Machine-checkable Definition of Done, by profile.
+# A gate is GREEN only when all required checks for the profile pass with
+# evidence. "n/a" commands (empty in verification) are skipped, not failed.
+# ---------------------------------------------------------------------------
+definition_of_done:
+  profiles:
+    prototype:
+      build_passes: true
+      lint_clean: false
+      new_tests_required: false
+      regression_suite_green: false
+      coverage_delta_min_pct: null
+      no_new_high_severity_findings: true
+      assumptions_documented: true
+    light:
+      build_passes: true
+      lint_clean: true
+      new_tests_required: false
+      regression_suite_green: true
+      coverage_delta_min_pct: null
+      no_new_high_severity_findings: true
+    standard:
+      build_passes: true
+      lint_clean: true
+      new_tests_required: true
+      regression_suite_green: true
+      coverage_delta_min_pct: 0     # must not decrease coverage
+      no_new_high_severity_findings: true
+      self_review_passed: true
+    strict:
+      build_passes: true
+      lint_clean: true
+      typecheck_clean: true
+      new_tests_required: true
+      regression_suite_green: true
+      coverage_delta_min_pct: 1     # net-positive coverage on changed scope
+      no_new_high_severity_findings: true
+      self_review_passed: true
+      security_gate_passed: true
+      secret_scan_clean: true
+
+# ---------------------------------------------------------------------------
+# Hard safety rules. These ALWAYS apply regardless of autonomy level.
+# The agent must STOP and get explicit confirmation before any of these.
+# ---------------------------------------------------------------------------
+safety:
+  always_confirm_before:
+    - "Deleting files, branches, tables, or data (rm -rf, DROP, git branch -D)."
+    - "git push, git push --force, git reset --hard, amending published commits."
+    - "Weakening or removing authentication/authorization checks."
+    - "Disabling security controls, validation, or safety checks (e.g. --no-verify)."
+    - "Modifying shared infrastructure, CI/CD secrets, or production config."
+    - "Sending messages, commenting on PRs/issues, or other outbound actions."
+  never_without_explicit_flag:
+    - "Lowering an existing permission/role requirement."
+    - "Logging secrets, tokens, PII, or credentials."
+    - "Committing secrets or .env files."
+  on_secret_detected: "Stop, do not commit, alert the user, and recommend rotation."
