@@ -5,7 +5,7 @@ The framework supports decomposing complex work items into parallel sub-tasks ex
 ## When to Spawn Parallel Agents
 - The task requires multiple non-overlapping skill sets (e.g., UI dev and Database migration).
 - The task is large enough that a single agent's context window would be saturated.
-- The `environment_profile` in `framework.config.yaml` allows `max_parallel_agents > 1`.
+- The active profile in `environment_profiles` in `framework.config.yaml` has `max_parallel_agents > 1`.
 
 ## 1. Work Breakdown Structure (WBS)
 Before spawning agents, the orchestrator must create a breakdown of independent milestones.
