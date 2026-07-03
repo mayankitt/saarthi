@@ -19,7 +19,47 @@
 #   3. Adjust `definition_of_done.*` thresholds to your standards.
 #   4. Everything else can stay as shipped defaults.
 
-version: "0.4.0"
+version: "0.5.0"
+
+# ---------------------------------------------------------------------------
+# Environment Profiles (Resource Awareness)
+# Orchestrator adapts parallelism and context bounds based on the active profile.
+# ---------------------------------------------------------------------------
+environment_profiles:
+  active: "cloud" # Change to local_small, local_large, etc., based on environment
+  profiles:
+    cloud:
+      description: "Cloud-hosted large models (e.g. GPT-4o, Claude 3.5 Sonnet)"
+      max_parallel_agents: 5
+      context_strategy: "full_history"
+    local_large:
+      description: "Local 14B-70B models"
+      max_parallel_agents: 2
+      context_strategy: "summarized_history"
+    local_small:
+      description: "Local 4B-8B models (e.g. Gemma 4B)"
+      max_parallel_agents: 1
+      context_strategy: "distilled_only" # Routes to 00a-distilled-entry-prompt.txt
+
+# ---------------------------------------------------------------------------
+# MCP Servers & Capabilities (Tool Integration)
+# Define expected tools. The framework will instruct agents to use these natively.
+# If a tool is missing and the user is non-technical, the agent will self-onboard
+# it by prompting the user for necessary credentials.
+# Users can manually add any custom MCP here to grant roles new powers.
+# ---------------------------------------------------------------------------
+mcp_servers:
+  self_onboarding_enabled: true
+  servers:
+    github:
+      expected_capabilities: ["read_pr", "create_issue", "github_actions_status"]
+      roles: ["dev_lead", "devops_lead"]
+    jira:
+      expected_capabilities: ["fetch_ticket", "update_status"]
+      roles: ["product_lead"]
+    sentry:
+      expected_capabilities: ["fetch_errors"]
+      roles: ["observability_lead"]
 
 # ---------------------------------------------------------------------------
 # Execution modes (how autonomous the agent should be)
@@ -80,6 +120,14 @@ models:
 # (02-workflow-modes.md explains these in prose.)
 # ---------------------------------------------------------------------------
 workflow_modes:
+  ephemeral_task:
+    risk: trivial
+    question_budget: 0
+    response_size: compact
+    model_tier: tier_1_light
+    leads: [master_orchestrator]
+    artifacts: [] # Zero ceremony: no folder, no intake, no summary
+    dod_profile: light
   micro_task:
     risk: low
     question_budget: 3

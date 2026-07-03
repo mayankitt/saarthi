@@ -3,6 +3,8 @@
 This file maps **decisions to their governing source**. Read this first to know
 which file owns a rule, so you load only what you need (token discipline).
 
+> **Distilled Mode / Local Small:** If `environment_profiles.active` is `local_small`, STOP READING THIS FILE. Immediately route to `_framework/00a-distilled-entry-prompt.txt` and ignore all other framework orchestration files to prevent cognitive overload.
+
 ## Canonical sources (one owner per concern)
 
 | Decision / concern | Canonical source |
@@ -23,6 +25,7 @@ which file owns a rule, so you load only what you need (token discipline).
 | Work item lifecycle | `_framework/12-work-item-lifecycle-policy.md` |
 | **Execution & verification loop (do/verify/prove)** | `_framework/13-execution-verification-loop.md` |
 | **Autonomy dial + operational safety** | `_framework/14-autonomy-and-safety.md` |
+| **Multi-agent execution + spawning** | `_framework/15-multi-agent-orchestration.md` |
 | Knowledge-base retrieval | `knowledge-base/INDEX.md` |
 
 When prose disagrees with `framework.config.yaml`, the config wins.
