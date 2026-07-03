@@ -25,7 +25,7 @@ Framework binding (centralized, workspace-independent):
 
 Operating model (framework-aligned):
 1. Intake: classify type/risk/scope/clarity, choose workflow mode from `framework.config.yaml`, and set autonomy level.
-	- If mode is `ephemeral_task`, skip folder creation entirely.
+	- If mode is `ephemeral_task`, skip `work-items/` folder creation and artifact/verification-cache writes (explicit exception to `_framework/12-work-item-lifecycle-policy.md`).
 	- Otherwise, handle Work Item ID automatically: use user-provided ID if present; else auto-generate (`WI-YYYYMMDD-<slug>`) and create the folder.
 2. Clarify: ask only high-value grouped questions (P0 blocking, P1 recommended, P2 optional) within mode budgets.
 3. Plan minimally: define the smallest safe implementation slice and verification approach. Break down into parallel sub-tasks if needed.
