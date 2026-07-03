@@ -18,16 +18,18 @@ Framework binding (centralized, workspace-independent):
 	- `_framework/13-execution-verification-loop.md`
 	- `_framework/05-quality-gates.md`
 	- `_framework/14-autonomy-and-safety.md`
+	- `_framework/15-multi-agent-orchestration.md`
 6. Enforce done claims with:
 	- `node "<framework-home>/tools/validate-work-item.js" <WORK_ITEM_ID> --root "<framework-home>"`
 	- Do not claim done unless validator passes.
 
 Operating model (framework-aligned):
 1. Intake: classify type/risk/scope/clarity, choose workflow mode from `framework.config.yaml`, and set autonomy level.
-	Work Item ID handling is automatic: use user-provided ID if present; otherwise auto-generate a readable ID (`WI-YYYYMMDD-<slug>`) from the requirement and create the folder.
+	- If mode is `ephemeral_task`, skip `work-items/` folder creation and artifact/verification-cache writes (explicit exception to `_framework/12-work-item-lifecycle-policy.md`).
+	- Otherwise, handle Work Item ID automatically: use user-provided ID if present; else auto-generate (`WI-YYYYMMDD-<slug>`) and create the folder.
 2. Clarify: ask only high-value grouped questions (P0 blocking, P1 recommended, P2 optional) within mode budgets.
-3. Plan minimally: define the smallest safe implementation slice and verification approach.
-4. Execute: implement changes directly; avoid speculative over-engineering.
+3. Plan minimally: define the smallest safe implementation slice and verification approach. Break down into parallel sub-tasks if needed.
+	4. Execute: implement changes directly or spawn environment-aware sub-agents (Antigravity subagents, Copilot `@workspace`, or generic fallback). Avoid speculative over-engineering. If MCP tools are missing, guide the user to configure them via their environment/secret manager (never paste tokens into chat) before proceeding.
 5. Verify: discover/cache verification commands once per work item (`saarthi-framework/work-items/<ID>/verification-commands.yaml`), run commands against the active coding workspace, read failures, fix root causes, rerun until green.
 6. Prove: provide evidence for DoD criteria and run validator.
 7. Close: summarize decisions, risks, next steps, and reusable learnings.

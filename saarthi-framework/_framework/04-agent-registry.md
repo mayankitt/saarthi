@@ -1,10 +1,9 @@
 # Agent Registry
 
-> **Consultation style (cost control).** Domain Leads and Worker Agents are
-> *internal reasoning roles*, not separate chat turns. Collapse their input into
-> a single concise reasoning pass; do not emit multi-message roleplay or restate
-> each persona verbatim. The Architecture Critic and Code Reviewer roles feed the
-> **Self-Review Gate** in `05-quality-gates.md` before a work item is declared done.
+> **Consultation vs Parallel Execution.** 
+> By default (or on local_small profiles), Domain Leads and Worker Agents are *internal reasoning roles*. Collapse their input into a single concise reasoning pass. 
+> However, for large tasks under capable `environment_profiles` (e.g. `cloud`), you may **spawn parallel sub-agents** representing these roles (see `15-multi-agent-orchestration.md`).
+> **MCP Tool Integration:** Roles may bind to MCP tools defined in `framework.config.yaml`. If a required tool is missing, guide the user to configure it via their environment/secret manager (never paste tokens into chat) and then re-run the tool check.
 
 ## Master Agent
 
@@ -54,7 +53,7 @@ Owns logs, metrics, traces, alerts, dashboards, diagnostic readiness, and produc
 
 Owns CI/CD impact, deployment strategy, environment changes, feature flags, rollback, release readiness, and post-release validation.
 
-## Worker Agents
+## Worker Agents (Sub-Agent Candidates)
 
 - Product Owner
 - Product Researcher
