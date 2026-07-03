@@ -3,7 +3,7 @@
 > **Consultation vs Parallel Execution.** 
 > By default (or on local_small profiles), Domain Leads and Worker Agents are *internal reasoning roles*. Collapse their input into a single concise reasoning pass. 
 > However, for large tasks under capable `environment_profiles` (e.g. `cloud`), you may **spawn parallel sub-agents** representing these roles (see `15-multi-agent-orchestration.md`).
-> **MCP Tool Integration:** Roles may bind to MCP tools defined in `framework.config.yaml`. If a required tool is missing, self-onboard the tool by asking the non-technical user for the necessary credentials/endpoints.
+> **MCP Tool Integration:** Roles may bind to MCP tools defined in `framework.config.yaml`. If a required tool is missing, guide the user to configure it via their environment/secret manager (never paste tokens into chat) and then re-run the tool check.
 
 ## Master Agent
 
