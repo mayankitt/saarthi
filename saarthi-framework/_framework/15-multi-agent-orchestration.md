@@ -41,8 +41,8 @@ If the environment is unknown, output a standardized block for the host applicat
 Role: <Domain Lead Role>
 Sub-Task ID: <SUB_ID>
 Requirement: <Specific requirement>
-Context: work-items/<ID>/sub-tasks/<SUB_ID>/
-Contract: work-items/<ID>/contracts/<contract_name>.md
+Context: work-items/<WORK_ITEM_ID>/sub-tasks/<SUB_ID>/
+Contract: work-items/<WORK_ITEM_ID>/contracts/<contract_name>.md
 ```
 
 ## 5. Integration and Synchronization
