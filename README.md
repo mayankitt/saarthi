@@ -44,7 +44,7 @@ saarthi/
 - **GitHub Copilot** or a similar agentic extension
 
 ### 2. Setup
-For detailed instructions, refer to [saarthi-framework/SETUP-CHECKLIST.txt](file:///d:/code/projects/saarthi/saarthi-framework/SETUP-CHECKLIST.txt). 
+For detailed instructions, refer to [saarthi-framework/SETUP-CHECKLIST.txt](saarthi-framework/SETUP-CHECKLIST.txt). 
 
 In short:
 1. Locate your editor's user prompts directory (e.g., `%APPDATA%\Code\User\prompts` on Windows).
@@ -84,4 +84,4 @@ This framework is licensed under a split **Personal / Commercial License**:
 - **Personal Use**: Free and open to everyone for personal, educational, and non-commercial projects.
 - **Commercial Use**: Use by organizations, freelancers, or individuals for commercial benefit requires purchasing a commercial license.
 
-See the [LICENSE](file:///d:/code/projects/saarthi/LICENSE) file for the full legal terms.
+See the [LICENSE](LICENSE) file for the full legal terms.

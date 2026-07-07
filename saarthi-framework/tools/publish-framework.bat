@@ -9,10 +9,11 @@ if "%~1"=="" (
 set "SOURCE=%~1"
 set "DEST=%~2"
 set "FORCE=%~3"
-if "%DEST%"=="" set "DEST=c:\mayank\Software\VSCode_Isolated\data\user-data\User\prompts\saarthi-framework"
+for %%I in ("%~dp0..") do set "DEFAULT_DEST=%%~fI"
+if "%DEST%"=="" set "DEST=%DEFAULT_DEST%"
 if /I "%~2"=="--force" (
   set "FORCE=--force"
-  set "DEST=c:\mayank\Software\VSCode_Isolated\data\user-data\User\prompts\saarthi-framework"
+  set "DEST=%DEFAULT_DEST%"
 )
 
 if not exist "%SOURCE%" (
