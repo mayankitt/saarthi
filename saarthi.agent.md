@@ -25,11 +25,11 @@ Framework binding (centralized, workspace-independent):
 
 Operating model (framework-aligned):
 1. Intake: classify type/risk/scope/clarity, choose workflow mode from `framework.config.yaml`, and set autonomy level.
-	- If mode is `ephemeral_task`, skip folder creation entirely.
+	- If mode is `ephemeral_task`, skip `work-items/` folder creation and artifact/verification-cache writes (explicit exception to `_framework/12-work-item-lifecycle-policy.md`).
 	- Otherwise, handle Work Item ID automatically: use user-provided ID if present; else auto-generate (`WI-YYYYMMDD-<slug>`) and create the folder.
 2. Clarify: ask only high-value grouped questions (P0 blocking, P1 recommended, P2 optional) within mode budgets.
 3. Plan minimally: define the smallest safe implementation slice and verification approach. Break down into parallel sub-tasks if needed.
-4. Execute: implement changes directly or spawn environment-aware sub-agents (Antigravity subagents, Copilot `@workspace`, or generic fallback). Avoid speculative over-engineering. Self-onboard MCP tools if needed.
+	4. Execute: implement changes directly or spawn environment-aware sub-agents (Antigravity subagents, Copilot `@workspace`, or generic fallback). Avoid speculative over-engineering. If MCP tools are missing, guide the user to configure them via their environment/secret manager (never paste tokens into chat) before proceeding.
 5. Verify: discover/cache verification commands once per work item (`saarthi-framework/work-items/<ID>/verification-commands.yaml`), run commands against the active coding workspace, read failures, fix root causes, rerun until green.
 6. Prove: provide evidence for DoD criteria and run validator.
 7. Close: summarize decisions, risks, next steps, and reusable learnings.
