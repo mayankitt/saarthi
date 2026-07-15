@@ -17,7 +17,7 @@ enough tags for an agent to decide relevance without opening the file.
 
 | File | Tags | Summary |
 |------|------|---------|
-| `preferences/README.md` | meta | How to record stable user/project preferences. |
+| `preferences/README.md` | meta | How to record stable user/project preferences; includes structured format and application rules. |
 
 ## Reusable Patterns
 
@@ -48,3 +48,6 @@ enough tags for an agent to decide relevance without opening the file.
 When the Finalize flow (`_framework/10-finalize-work-item-prompt.md`) promotes a
 learning, preference, pattern, or ADR, **add a row here in the same step**. An
 entry that is not indexed will not be found efficiently.
+
+See `_framework/16-adaptive-learning.md` for the full policy on when and how to
+promote preferences from work-item observations to this knowledge base.
