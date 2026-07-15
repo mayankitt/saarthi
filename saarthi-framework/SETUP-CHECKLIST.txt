@@ -35,13 +35,22 @@ A) GITHUB COPILOT (VS Code)
 
 2. Copy all files listed above into that folder.
 
-3. Reload VS Code: Developer > Reload Window
+3. Set the active agent in framework.config.yaml:
+   Open <framework-home>/framework.config.yaml and change:
+     agent_context:
+       active_agent: "generic"
+   to:
+     agent_context:
+       active_agent: "github_copilot"
+   This enables agent-aware tool discovery from the first session.
 
-4. Open Copilot Chat. Confirm:
+4. Reload VS Code: Developer > Reload Window
+
+5. Open Copilot Chat. Confirm:
    - Custom agent "सारथी (Saarthi)" appears
    - Slash prompts /work-item-kickoff and /saarthi-publish-to-central appear
 
-5. Run smoke test:
+6. Run smoke test:
    node "<framework-home>/tools/smoke-test-framework.js" --root "<framework-home>"
    Expected: SMOKE TEST PASSED
 
@@ -56,12 +65,20 @@ Option 2 — Project-specific rules:
 2. Copy saarthi-framework/ into the project root.
 3. Create .cursor/rules/saarthi.mdc referencing the framework AGENTS.md.
 
-4. In Cursor settings, enable "Include .cursorrules" or "Custom instructions".
+4. Set the active agent in framework.config.yaml:
+   Open <framework-home>/framework.config.yaml and change:
+     agent_context:
+       active_agent: "generic"
+   to:
+     agent_context:
+       active_agent: "cursor"
 
-5. Open Cursor AI chat. The framework instructions load automatically
+5. In Cursor settings, enable "Include .cursorrules" or "Custom instructions".
+
+6. Open Cursor AI chat. The framework instructions load automatically
    when you start a conversation.
 
-6. Run smoke test from terminal:
+7. Run smoke test from terminal:
    node "<framework-home>/tools/smoke-test-framework.js" --root "<framework-home>"
 
 ============================================================
@@ -71,18 +88,26 @@ C) CLAUDE CODE (CLI)
    Recommended: ~/.config/claude/saarthi-framework/
    (and the other root files into ~/.config/claude/)
 
-2. Add AGENTS.md (or its contents) to your project root so
+2. Set the active agent in framework.config.yaml:
+   Open <framework-home>/framework.config.yaml and change:
+     agent_context:
+       active_agent: "generic"
+   to:
+     agent_context:
+       active_agent: "claude_code"
+
+3. Add AGENTS.md (or its contents) to your project root so
    Claude Code reads it automatically on startup in that project.
 
    Alternatively, use a global CLAUDE.md:
    cp saarthi-framework/AGENTS.md ~/.config/claude/CLAUDE.md
    # Or append saarthi instructions to an existing CLAUDE.md
 
-3. For persistent cross-project use, add to ~/.config/claude/CLAUDE.md:
+4. For persistent cross-project use, add to ~/.config/claude/CLAUDE.md:
    # Reference to framework
    Framework instructions: see ~/.config/claude/saarthi-framework/AGENTS.md
 
-4. Run smoke test:
+5. Run smoke test:
    node "<framework-home>/tools/smoke-test-framework.js" --root "<framework-home>"
 
 ============================================================
@@ -90,16 +115,24 @@ D) GITHUB COPILOT CLI (gh copilot)
 ============================================================
 1. Place saarthi-framework/ in a known directory (e.g. ~/saarthi-framework).
 
-2. When using `gh copilot suggest` or `gh copilot explain`, prefix your
+2. Set the active agent in framework.config.yaml:
+   Open <framework-home>/framework.config.yaml and change:
+     agent_context:
+       active_agent: "generic"
+   to:
+     agent_context:
+       active_agent: "github_copilot"
+
+3. When using `gh copilot suggest` or `gh copilot explain`, prefix your
    prompt with the framework entry or use a shell alias:
 
    alias saarthi='gh copilot suggest --target shell'
 
-3. For persistent context, create a ~/.config/gh/copilot-context.md
+4. For persistent context, create a ~/.config/gh/copilot-context.md
    (if supported by your gh version) or paste the distilled entry prompt
    (_framework/00a-distilled-entry-prompt.txt) at the start of sessions.
 
-4. Run smoke test:
+5. Run smoke test:
    node "<framework-home>/tools/smoke-test-framework.js" --root "<framework-home>"
 
 ============================================================
@@ -108,13 +141,21 @@ E) WINDSURF
 1. Place all files in ~/.windsurf/prompts/ (create if missing)
    or in the project root.
 
-2. Open Windsurf. In the Cascade panel, the framework will be
+2. Set the active agent in framework.config.yaml:
+   Open <framework-home>/framework.config.yaml and change:
+     agent_context:
+       active_agent: "generic"
+   to:
+     agent_context:
+       active_agent: "windsurf"
+
+3. Open Windsurf. In the Cascade panel, the framework will be
    discoverable if the files are in the workspace or prompts directory.
 
-3. To activate, start a conversation with:
+4. To activate, start a conversation with:
    "Load the Saarthi framework from <framework-home>/AGENTS.md"
 
-4. Run smoke test:
+5. Run smoke test:
    node "<framework-home>/tools/smoke-test-framework.js" --root "<framework-home>"
 
 ============================================================
@@ -122,13 +163,22 @@ F) CLINE / CONTINUE / OTHER TOOLS
 ============================================================
 1. Copy saarthi-framework/ to a known path (e.g. ~/saarthi-framework).
 
-2. Drop saarthi-framework/AGENTS.md into your project root (rename to
+2. Set the active agent in framework.config.yaml:
+   Open <framework-home>/framework.config.yaml and change:
+     agent_context:
+       active_agent: "generic"
+   to the appropriate value for your tool:
+     - Cline:    active_agent: "cline"
+     - Continue: active_agent: "continue"
+     - Other:    active_agent: "generic"
+
+3. Drop saarthi-framework/AGENTS.md into your project root (rename to
    AGENTS.md or the tool's equivalent instruction file if needed).
 
-3. Configure the tool's "system prompt" or "custom instructions" to
+4. Configure the tool's "system prompt" or "custom instructions" to
    reference _framework/00-single-entry-prompt.md or paste its contents.
 
-4. Run smoke test:
+5. Run smoke test:
    node "<framework-home>/tools/smoke-test-framework.js" --root "<framework-home>"
 
 ============================================================
@@ -136,13 +186,21 @@ G) ANTIGRAVITY / ANTIGRAVITY CLI
 ============================================================
 1. Copy saarthi-framework/ to your workspace directory.
 
-2. The framework AGENTS.md is automatically read by Antigravity when
+2. Set the active agent in framework.config.yaml:
+   Open <framework-home>/framework.config.yaml and change:
+     agent_context:
+       active_agent: "generic"
+   to:
+     agent_context:
+       active_agent: "antigravity"
+
+3. The framework AGENTS.md is automatically read by Antigravity when
    placed in the repository root.
 
-3. For Antigravity CLI, pass the entry prompt at invocation:
+4. For Antigravity CLI, pass the entry prompt at invocation:
    antigravity run --system-prompt <framework-home>/_framework/00-single-entry-prompt.md
 
-4. Run smoke test:
+5. Run smoke test:
    node "<framework-home>/tools/smoke-test-framework.js" --root "<framework-home>"
 
 ============================================================

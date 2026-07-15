@@ -10,6 +10,7 @@ which file owns a rule, so you load only what you need (token discipline).
 | Decision / concern | Canonical source |
 |---|---|
 | Machine-readable modes, tiers, budgets, DoD, safety | `framework.config.yaml` |
+| **Host coding agent identity & compatibility** | **`framework.config.yaml` → `agent_context`** |
 | Entry behavior + output format | `_framework/00-single-entry-prompt.md` |
 | Orchestration, routing, classification | `_framework/01-saarthi-orchestrator.md` |
 | Workflow mode definitions (prose) | `_framework/02-workflow-modes.md` |
@@ -50,7 +51,7 @@ Everything else is detail to load on demand via this index.
 
 ## Load-on-demand order (per phase)
 
-- **Intake/clarification:** 00, 03, 11, 12, 16 (apply known preferences) + `knowledge-base/INDEX.md`
+- **Intake/clarification:** 00, 03, 11, 12, 16 (apply known preferences) + `knowledge-base/INDEX.md` + `agent_context` from `framework.config.yaml` (load host agent identity for tool discovery qualification)
 - **Design:** 01, 02, 04, 05 (design gate), 07, 08
 - **Development:** 13, 14, 05 (dev gate), `framework.config.yaml` verification
 - **QA/Release:** 05 (release gate), 13 (evidence), test-plan artifact

@@ -7,6 +7,8 @@ the user.
 
 Source of truth for available tools and self-onboarding config: the
 `mcp_servers` block in `framework.config.yaml`.
+Agent identity and compatibility rules: the `agent_context` block in
+`framework.config.yaml`.
 
 ---
 
@@ -27,6 +29,25 @@ capabilities are already confirmed available.
 
 ## 2. Discovery Process
 
+### Step 0 — Load host agent context
+
+Before any other step, read `agent_context` from `framework.config.yaml`:
+
+```
+active_agent   → e.g. "github_copilot"
+agent_aware_search → true | false
+known_agents.<active_agent>.search_qualifier → e.g. "GitHub Copilot VS Code"
+known_agents.<active_agent>.incompatible_with → list of tool IDs to exclude
+known_agents.<active_agent>.preferred_tool_sources → ordered search sources
+```
+
+If `active_agent` is `"generic"`, skip qualifier-based filtering but still
+complete discovery with a broad (unqualified) search and note the result may
+not be host-specific.
+
+If `agent_aware_search` is `false`, treat `search_qualifier` as empty and skip
+compatibility filtering.
+
 ### Step 1 — Identify capability gaps
 
 From the task classification, determine what external capabilities would help:
@@ -40,27 +61,46 @@ From the task classification, determine what external capabilities would help:
 | Infrastructure change | Cloud provider CLI / Terraform |
 | API integration | OpenAPI spec fetch, REST client |
 | Security review | SAST tool, dependency scanner |
+| Persistent memory / recall | Memory/context store MCP |
 
 ### Step 2 — Check currently configured tools
 
 Read `framework.config.yaml` `mcp_servers.servers` to see what is already
 registered and available.
 
-### Step 3 — Research missing tools
+### Step 3 — Research missing tools (agent-qualified)
 
 For each capability gap without a registered tool:
 
-1. **Search known MCP registries** in priority order:
+1. **Construct the search query** using the host agent qualifier:
+   - If `agent_aware_search: true` and `search_qualifier` is non-empty:
+     → `"<capability description> MCP for <search_qualifier>"`
+     e.g., `"persistent memory MCP for GitHub Copilot VS Code"`
+   - Otherwise:
+     → `"<capability description> MCP"`
+
+2. **Search known MCP registries** in the order defined by
+   `known_agents.<active_agent>.preferred_tool_sources` (falling back to the
+   global `mcp_servers.discovery_registries` order):
    - [modelcontextprotocol.io/servers](https://modelcontextprotocol.io/servers)
    - [github.com/modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers)
    - [mcp.so](https://mcp.so)
    - Vendor-official MCP packages (e.g., `@anthropic-ai/mcp-*`, `@github/mcp-*`)
-2. **Evaluate candidates** on:
+
+3. **Filter out incompatible tools**: if a candidate appears in
+   `known_agents.<active_agent>.incompatible_with`, mark it incompatible and
+   exclude it from the primary recommendation. Surface it separately only if
+   explicitly requested or if no compatible alternative exists.
+
+4. **Evaluate remaining candidates** on:
    - Relevance to the specific capability gap
+   - Compatibility with the active host agent (native integration preferred)
    - Maintenance status (recent commits, active maintainer)
    - Security profile (open source, no exfiltration risk, minimal permissions)
    - Adoption (stars, downloads, known users)
-3. **Select the best fit** or surface top 2–3 options to the user if ambiguous.
+
+5. **Select the best fit** or surface top 2–3 compatible options to the user
+   if ambiguous.
 
 ### Step 4 — Present recommendation (always before installing)
 
@@ -69,13 +109,22 @@ Before installing any tool, present a brief summary to the user:
 ```
 📦 Tool Discovery: I identified a capability gap for this task.
 
+Host agent: <active_agent display name>
 Gap: <what the task needs>
+Search used: "<agent-qualified search query>"
 Recommended MCP: <name> (<source URL>)
-Why: <1-2 sentence rationale>
+Why: <1-2 sentence rationale, including why it fits this host agent>
 Permissions required: <what it will access>
 Install command: <exact command>
 
 Shall I proceed with installation? [Y/n]
+```
+
+If any candidates were excluded due to host-agent incompatibility, append:
+
+```
+ℹ️ Excluded (incompatible with <host agent>): <tool name> — requires <reason>.
+   To use it, switch to <compatible agent> or disable agent_aware_search.
 ```
 
 Never install silently. Installation is an irreversible environment change and
@@ -86,8 +135,10 @@ always requires user confirmation (see `framework.config.yaml`
 
 ## 3. Self-Installation
 
-When the user confirms, attempt self-installation using the environment's
-native mechanism:
+When the user confirms, attempt self-installation using the config file
+for the active host agent (from `known_agents.<active_agent>.mcp_config_files`).
+If the host agent is not recognized or its config file path is unknown, fall
+back to the standardized manual block.
 
 ### GitHub Copilot / VS Code
 ```json
@@ -156,7 +207,16 @@ After installation:
 2. Run a lightweight capability check (e.g., a read-only API call).
 3. If verification fails, diagnose and surface the error clearly.
 4. Update `framework.config.yaml` `mcp_servers.servers` to register the newly
-   installed tool so it is recognized in future work items.
+   installed tool, including an `installed_for` field noting the host agent,
+   so it is recognized in future work items:
+   ```yaml
+   servers:
+     <server-name>:
+       expected_capabilities: [...]
+       roles: [...]
+       package: "<package-name>"
+       installed_for: "<active_agent>"   # e.g. "github_copilot"
+   ```
 
 ---
 
