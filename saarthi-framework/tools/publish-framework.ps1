@@ -2,10 +2,14 @@ param(
   [Parameter(Mandatory = $true)]
   [string]$SourcePath,
 
-  [string]$DestinationPath = "c:\mayank\Software\VSCode_Isolated\data\user-data\User\prompts\saarthi-framework",
+  [string]$DestinationPath,
 
   [switch]$Force
 )
+
+if ([string]::IsNullOrEmpty($DestinationPath)) {
+  $DestinationPath = Split-Path -Parent $PSScriptRoot
+}
 
 $ErrorActionPreference = "Stop"
 

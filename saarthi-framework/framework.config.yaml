@@ -2,6 +2,7 @@
 # Machine-readable control plane for the AI Agent Framework.
 #
 # This file is the SINGLE SOURCE OF TRUTH for:
+#   - host coding agent identity and compatibility (agent_context)
 #   - workflow mode -> leads -> artifacts -> question budget
 #   - model tier -> model selection policy
 #   - per-mode token/cost budgets and stop-and-report thresholds
@@ -12,14 +13,167 @@
 # When prose and this file disagree, THIS FILE WINS.
 #
 # How to adopt in a new repository:
-#   1. (Optional) Set `models.tier_map` hints, or leave `models.selection: auto`
+#   1. Set `agent_context.active_agent` to your coding tool's key
+#      (github_copilot | claude_code | cursor | windsurf | cline | continue |
+#       antigravity | generic). See SETUP-CHECKLIST.txt for step-by-step guide.
+#   2. (Optional) Set `models.tier_map` hints, or leave `models.selection: auto`
 #      to let the orchestrator pick the appropriate model per tier.
-#   2. Do NOT hard-code build/test commands. They are auto-discovered once per
+#   3. Do NOT hard-code build/test commands. They are auto-discovered once per
 #      work item and cached in work-items/<ID>/verification-commands.yaml.
-#   3. Adjust `definition_of_done.*` thresholds to your standards.
-#   4. Everything else can stay as shipped defaults.
+#   4. Adjust `definition_of_done.*` thresholds to your standards.
+#   5. Everything else can stay as shipped defaults.
 
 version: "0.5.0"
+
+# ---------------------------------------------------------------------------
+# Agent Context (Coding-Agent Awareness)
+# Identifies which coding agent/tool hosts this framework instance.
+# The orchestrator uses this to qualify tool discovery searches and filter
+# recommendations to those compatible with the host agent.
+#
+# How to set at installation time:
+#   Set `agent_context.active_agent` to the key matching your coding tool.
+#   If left as "generic", the framework will ask once on first use.
+# ---------------------------------------------------------------------------
+agent_context:
+  # The coding agent hosting this framework instance.
+  # Valid values: github_copilot | claude_code | cursor | windsurf | cline |
+  #               continue | antigravity | generic
+  # "generic" means unknown/not yet set — triggers a one-time detection prompt.
+  active_agent: "generic"
+
+  # When true, all tool/skill discovery searches are qualified with the active
+  # agent name (e.g., "persistent memory MCP for GitHub Copilot" instead of
+  # "persistent memory MCP"). Set to false to disable agent-qualified searches.
+  agent_aware_search: true
+
+  # Catalog of known host agents with their traits.
+  # Used to qualify searches, filter incompatible tools, and generate the
+  # correct installation config blocks in 17-mcp-tool-discovery.md.
+  known_agents:
+    github_copilot:
+      display_name: "GitHub Copilot (VS Code)"
+      mcp_config_files:
+        - ".vscode/mcp.json"
+        - "settings.json (mcpServers block)"
+      native_skills:
+        - "VS Code extensions"
+        - "GitHub Copilot Extensions"
+        - "@workspace context"
+      preferred_tool_sources:
+        - "VS Code Marketplace"
+        - "GitHub Copilot Extensions marketplace"
+        - "modelcontextprotocol.io/servers"
+      incompatible_with:
+        - "claude-mem"           # Requires Claude Code memory subsystem
+        - "claude_code_memory"   # Claude Code native memory
+      search_qualifier: "GitHub Copilot VS Code"
+
+    claude_code:
+      display_name: "Claude Code (CLI)"
+      mcp_config_files:
+        - "~/.config/claude/mcp.json"
+        - ".mcp.json (project root)"
+      native_skills:
+        - "claude-mem (persistent memory)"
+        - "CLAUDE.md context"
+        - "Native MCP via ~/.config/claude/"
+      preferred_tool_sources:
+        - "modelcontextprotocol.io/servers"
+        - "github.com/modelcontextprotocol/servers"
+        - "Anthropic official MCP packages"
+      incompatible_with: []
+      search_qualifier: "Claude Code Anthropic"
+
+    cursor:
+      display_name: "Cursor"
+      mcp_config_files:
+        - "~/.cursor/mcp.json"
+        - ".cursor/mcp.json (project)"
+      native_skills:
+        - ".cursorrules context"
+        - "Cursor Composer"
+        - "Cursor extensions"
+      preferred_tool_sources:
+        - "modelcontextprotocol.io/servers"
+        - "github.com/modelcontextprotocol/servers"
+        - "Cursor Extensions directory"
+      incompatible_with:
+        - "claude-mem"
+        - "claude_code_memory"
+      search_qualifier: "Cursor AI editor"
+
+    windsurf:
+      display_name: "Windsurf (Codeium)"
+      mcp_config_files:
+        - "~/.windsurf/mcp.json"
+        - ".windsurf/mcp.json (project)"
+      native_skills:
+        - "Windsurf Flows"
+        - "Cascade context"
+        - "Codeium extensions"
+      preferred_tool_sources:
+        - "modelcontextprotocol.io/servers"
+        - "Codeium plugin directory"
+      incompatible_with:
+        - "claude-mem"
+        - "claude_code_memory"
+      search_qualifier: "Windsurf Codeium"
+
+    cline:
+      display_name: "Cline (VS Code extension)"
+      mcp_config_files:
+        - "VS Code settings / Cline MCP settings panel"
+      native_skills:
+        - "VS Code extensions"
+        - "Cline tool use"
+      preferred_tool_sources:
+        - "modelcontextprotocol.io/servers"
+        - "VS Code Marketplace"
+      incompatible_with:
+        - "claude-mem"
+        - "claude_code_memory"
+      search_qualifier: "Cline VS Code"
+
+    continue:
+      display_name: "Continue (VS Code / JetBrains)"
+      mcp_config_files:
+        - "~/.continue/config.json"
+      native_skills:
+        - "Continue context providers"
+        - "VS Code / JetBrains extensions"
+      preferred_tool_sources:
+        - "modelcontextprotocol.io/servers"
+        - "Continue Hub"
+      incompatible_with:
+        - "claude-mem"
+        - "claude_code_memory"
+      search_qualifier: "Continue dev extension"
+
+    antigravity:
+      display_name: "Antigravity / Antigravity CLI"
+      mcp_config_files:
+        - "workspace AGENTS.md or CLI flags"
+      native_skills:
+        - "Antigravity sub-agents"
+        - "AGENTS.md-driven context"
+      preferred_tool_sources:
+        - "modelcontextprotocol.io/servers"
+      incompatible_with:
+        - "claude-mem"
+        - "claude_code_memory"
+      search_qualifier: "Antigravity AI agent"
+
+    generic:
+      display_name: "Generic / Unknown"
+      mcp_config_files: []
+      native_skills: []
+      preferred_tool_sources:
+        - "modelcontextprotocol.io/servers"
+        - "github.com/modelcontextprotocol/servers"
+        - "mcp.so"
+      incompatible_with: []
+      search_qualifier: ""   # No qualifier — broad search
 
 # ---------------------------------------------------------------------------
 # Environment Profiles (Resource Awareness)
@@ -44,21 +198,61 @@ environment_profiles:
 # ---------------------------------------------------------------------------
 # MCP Servers & Capabilities (Tool Integration)
 # Define expected tools. The framework will instruct agents to use these natively.
-# If a tool is missing, guide the user to configure credentials in their environment/secret manager (never paste tokens into chat).
+# If a tool is missing, the agent will research and recommend the best MCP to
+# fill the gap (see _framework/17-mcp-tool-discovery.md).
+# Always guide users to configure credentials via their environment/secret manager
+# (never paste tokens into chat).
 # Users can manually add any custom MCP here to grant roles new powers.
 # ---------------------------------------------------------------------------
 mcp_servers:
   self_onboarding_enabled: true
+  # When a capability gap is detected, search these registries in order:
+  discovery_registries:
+    - "https://modelcontextprotocol.io/servers"
+    - "https://github.com/modelcontextprotocol/servers"
+    - "https://mcp.so"
+  # Prefer official vendor servers over community alternatives.
+  prefer_official: true
+  # Always present a confirmation prompt before installing any MCP server.
+  require_user_confirmation_before_install: true
   servers:
     github:
       expected_capabilities: ["read_pr", "create_issue", "github_actions_status"]
       roles: ["dev_lead", "devops_lead"]
+      package: "@modelcontextprotocol/server-github"
     jira:
       expected_capabilities: ["fetch_ticket", "update_status"]
       roles: ["product_lead"]
     sentry:
       expected_capabilities: ["fetch_errors"]
       roles: ["observability_lead"]
+
+# ---------------------------------------------------------------------------
+# Adaptive Learning & Self-Evolution
+# Controls how the framework learns from user interactions over time.
+# Full policy: _framework/16-adaptive-learning.md
+# ---------------------------------------------------------------------------
+adaptive_learning:
+  enabled: true
+  # Minimum number of consistent observations before promoting confidence.
+  confidence_thresholds:
+    low_to_medium: 2   # observations needed to move from low -> medium
+    medium_to_high: 3  # observations needed to move from medium -> high
+  # How long (days) before an unobserved preference is flagged for review.
+  preference_decay_days: 90
+  # Categories that may NEVER be applied without explicit user confirmation,
+  # regardless of confidence level (mapped to criticality: high).
+  always_confirm_categories:
+    - security
+    - authentication
+    - authorization
+    - data-schema
+    - infrastructure
+    - ci-cd
+  # At finalization, automatically check for new preference candidates.
+  auto_extract_at_finalization: true
+  # Surface medium-confidence preferences as pre-selected P2 defaults at intake.
+  surface_as_defaults_at_intake: true
 
 # ---------------------------------------------------------------------------
 # Execution modes (how autonomous the agent should be)

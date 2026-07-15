@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+DEFAULT_DEST="$( cd "$SCRIPT_DIR/.." >/dev/null 2>&1 && pwd )"
+
 SOURCE_PATH="${1:-}"
-DESTINATION_PATH="${2:-c:/mayank/Software/VSCode_Isolated/data/user-data/User/prompts/saarthi-framework}"
+DESTINATION_PATH="${2:-$DEFAULT_DEST}"
 FORCE_FLAG="${3:-}"
 
 if [[ -z "$SOURCE_PATH" ]]; then
@@ -10,7 +13,7 @@ if [[ -z "$SOURCE_PATH" ]]; then
   exit 64
 fi
 if [[ "${2:-}" == "--force" ]]; then
-  DESTINATION_PATH="c:/mayank/Software/VSCode_Isolated/data/user-data/User/prompts/saarthi-framework"
+  DESTINATION_PATH="$DEFAULT_DEST"
   FORCE_FLAG="--force"
 fi
 
