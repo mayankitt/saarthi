@@ -44,21 +44,61 @@ environment_profiles:
 # ---------------------------------------------------------------------------
 # MCP Servers & Capabilities (Tool Integration)
 # Define expected tools. The framework will instruct agents to use these natively.
-# If a tool is missing, guide the user to configure credentials in their environment/secret manager (never paste tokens into chat).
+# If a tool is missing, the agent will research and recommend the best MCP to
+# fill the gap (see _framework/17-mcp-tool-discovery.md).
+# Always guide users to configure credentials via their environment/secret manager
+# (never paste tokens into chat).
 # Users can manually add any custom MCP here to grant roles new powers.
 # ---------------------------------------------------------------------------
 mcp_servers:
   self_onboarding_enabled: true
+  # When a capability gap is detected, search these registries in order:
+  discovery_registries:
+    - "https://modelcontextprotocol.io/servers"
+    - "https://github.com/modelcontextprotocol/servers"
+    - "https://mcp.so"
+  # Prefer official vendor servers over community alternatives.
+  prefer_official: true
+  # Always present a confirmation prompt before installing any MCP server.
+  require_user_confirmation_before_install: true
   servers:
     github:
       expected_capabilities: ["read_pr", "create_issue", "github_actions_status"]
       roles: ["dev_lead", "devops_lead"]
+      package: "@modelcontextprotocol/server-github"
     jira:
       expected_capabilities: ["fetch_ticket", "update_status"]
       roles: ["product_lead"]
     sentry:
       expected_capabilities: ["fetch_errors"]
       roles: ["observability_lead"]
+
+# ---------------------------------------------------------------------------
+# Adaptive Learning & Self-Evolution
+# Controls how the framework learns from user interactions over time.
+# Full policy: _framework/16-adaptive-learning.md
+# ---------------------------------------------------------------------------
+adaptive_learning:
+  enabled: true
+  # Minimum number of consistent observations before promoting confidence.
+  confidence_thresholds:
+    low_to_medium: 2   # observations needed to move from low -> medium
+    medium_to_high: 3  # observations needed to move from medium -> high
+  # How long (days) before an unobserved preference is flagged for review.
+  preference_decay_days: 90
+  # Categories that may NEVER be applied without explicit user confirmation,
+  # regardless of confidence level (mapped to criticality: high).
+  always_confirm_categories:
+    - security
+    - authentication
+    - authorization
+    - data-schema
+    - infrastructure
+    - ci-cd
+  # At finalization, automatically check for new preference candidates.
+  auto_extract_at_finalization: true
+  # Surface medium-confidence preferences as pre-selected P2 defaults at intake.
+  surface_as_defaults_at_intake: true
 
 # ---------------------------------------------------------------------------
 # Execution modes (how autonomous the agent should be)

@@ -1,138 +1,193 @@
-MISSION CONTROL FRAMEWORK SETUP CHECKLIST (NO GITHUB SYNC)
+सारथी (Saarthi) SETUP CHECKLIST — ALL MAJOR TOOLS
 
-Purpose
-- Set up सारथी (Saarthi) on any VS Code installation without requiring framework files in coding repositories.
-- Keep a centralized local framework source-of-truth in the VS Code user prompts area.
+This checklist covers installation on the most popular AI coding tools.
+The framework is agent-agnostic: the same files work everywhere.
 
---------------------------------------------------------------------
-1) Pre-requisites
---------------------------------------------------------------------
-- Install VS Code.
-- Install Node.js.
-- Install GitHub Copilot extension and sign in.
+============================================================
+WHAT YOU NEED TO COPY (same for all tools)
+============================================================
+From this repository, copy these files/folders to the tool-specific
+location described below:
 
---------------------------------------------------------------------
-2) Find or create the VS Code user prompts folder
---------------------------------------------------------------------
-Typical locations:
-- Windows: %APPDATA%\Code\User\prompts
-- macOS: ~/Library/Application Support/Code/User/prompts
-- Linux: ~/.config/Code/User/prompts
-
-If missing, create the prompts folder.
+  saarthi.agent.md
+  work-item-kickoff.prompt.md
+  saarthi-publish-to-central.prompt.md
+  pilot-checklist.prompt.md          (optional)
+  saarthi-framework/                 (entire folder tree)
 
 Define:
-- <user-prompts-root> = the folder above
-- <framework-home> = <user-prompts-root>/saarthi-framework
+  <framework-home> = <destination>/saarthi-framework
 
---------------------------------------------------------------------
-3) Copy required files into user prompts
---------------------------------------------------------------------
-Copy these into <user-prompts-root>:
-- saarthi.agent.md
-- work-item-kickoff.prompt.md
-- saarthi-publish-to-central.prompt.md
-- pilot-checklist.prompt.md (optional)
-- saarthi-framework/ (entire folder tree)
+============================================================
+PREREQUISITES (all tools)
+============================================================
+- Node.js installed (for smoke test and validation scripts)
+- The AI coding tool of your choice installed and signed in
 
---------------------------------------------------------------------
-4) Reload and verify discovery
---------------------------------------------------------------------
-- In VS Code, run: Developer: Reload Window
-- Open Copilot Chat.
-- Confirm the custom agent सारथी (Saarthi) appears.
-- Confirm slash prompts are discoverable:
-  - /work-item-kickoff
-  - /saarthi-publish-to-central
+============================================================
+A) GITHUB COPILOT (VS Code)
+============================================================
+1. Find the VS Code user prompts folder:
+   - Windows:  %APPDATA%\Code\User\prompts
+   - macOS:    ~/Library/Application Support/Code/User/prompts
+   - Linux:    ~/.config/Code/User/prompts
+   Create it if missing.
 
-Note: selecting सारथी (Saarthi) does NOT auto-populate a starter prompt.
-Use /work-item-kickoff explicitly.
+2. Copy all files listed above into that folder.
 
---------------------------------------------------------------------
-5) Validate framework health (one-time)
---------------------------------------------------------------------
-From terminal:
+3. Reload VS Code: Developer > Reload Window
 
-Windows PowerShell:
-node "<framework-home>\tools\smoke-test-framework.js" --root "<framework-home>"
+4. Open Copilot Chat. Confirm:
+   - Custom agent "सारथी (Saarthi)" appears
+   - Slash prompts /work-item-kickoff and /saarthi-publish-to-central appear
 
-macOS/Linux:
+5. Run smoke test:
+   node "<framework-home>/tools/smoke-test-framework.js" --root "<framework-home>"
+   Expected: SMOKE TEST PASSED
+
+============================================================
+B) CURSOR
+============================================================
+Option 1 — Global rules (recommended):
+1. Copy all files into ~/.cursor/prompts/ (create if missing).
+
+Option 2 — Project-specific rules:
+1. In your project root, create .cursor/rules/ (if missing).
+2. Copy saarthi-framework/ into the project root.
+3. Create .cursor/rules/saarthi.mdc referencing the framework AGENTS.md.
+
+4. In Cursor settings, enable "Include .cursorrules" or "Custom instructions".
+
+5. Open Cursor AI chat. The framework instructions load automatically
+   when you start a conversation.
+
+6. Run smoke test from terminal:
+   node "<framework-home>/tools/smoke-test-framework.js" --root "<framework-home>"
+
+============================================================
+C) CLAUDE CODE (CLI)
+============================================================
+1. Copy all files into your desired framework home directory:
+   Recommended: ~/.config/claude/saarthi-framework/
+   (and the other root files into ~/.config/claude/)
+
+2. Add AGENTS.md (or its contents) to your project root so
+   Claude Code reads it automatically on startup in that project.
+
+   Alternatively, use a global CLAUDE.md:
+   cp saarthi-framework/AGENTS.md ~/.config/claude/CLAUDE.md
+   # Or append saarthi instructions to an existing CLAUDE.md
+
+3. For persistent cross-project use, add to ~/.config/claude/CLAUDE.md:
+   # Reference to framework
+   Framework instructions: see ~/.config/claude/saarthi-framework/AGENTS.md
+
+4. Run smoke test:
+   node "<framework-home>/tools/smoke-test-framework.js" --root "<framework-home>"
+
+============================================================
+D) GITHUB COPILOT CLI (gh copilot)
+============================================================
+1. Place saarthi-framework/ in a known directory (e.g. ~/saarthi-framework).
+
+2. When using `gh copilot suggest` or `gh copilot explain`, prefix your
+   prompt with the framework entry or use a shell alias:
+
+   alias saarthi='gh copilot suggest --target shell'
+
+3. For persistent context, create a ~/.config/gh/copilot-context.md
+   (if supported by your gh version) or paste the distilled entry prompt
+   (_framework/00a-distilled-entry-prompt.txt) at the start of sessions.
+
+4. Run smoke test:
+   node "<framework-home>/tools/smoke-test-framework.js" --root "<framework-home>"
+
+============================================================
+E) WINDSURF
+============================================================
+1. Place all files in ~/.windsurf/prompts/ (create if missing)
+   or in the project root.
+
+2. Open Windsurf. In the Cascade panel, the framework will be
+   discoverable if the files are in the workspace or prompts directory.
+
+3. To activate, start a conversation with:
+   "Load the Saarthi framework from <framework-home>/AGENTS.md"
+
+4. Run smoke test:
+   node "<framework-home>/tools/smoke-test-framework.js" --root "<framework-home>"
+
+============================================================
+F) CLINE / CONTINUE / OTHER TOOLS
+============================================================
+1. Copy saarthi-framework/ to a known path (e.g. ~/saarthi-framework).
+
+2. Drop saarthi-framework/AGENTS.md into your project root (rename to
+   AGENTS.md or the tool's equivalent instruction file if needed).
+
+3. Configure the tool's "system prompt" or "custom instructions" to
+   reference _framework/00-single-entry-prompt.md or paste its contents.
+
+4. Run smoke test:
+   node "<framework-home>/tools/smoke-test-framework.js" --root "<framework-home>"
+
+============================================================
+G) ANTIGRAVITY / ANTIGRAVITY CLI
+============================================================
+1. Copy saarthi-framework/ to your workspace directory.
+
+2. The framework AGENTS.md is automatically read by Antigravity when
+   placed in the repository root.
+
+3. For Antigravity CLI, pass the entry prompt at invocation:
+   antigravity run --system-prompt <framework-home>/_framework/00-single-entry-prompt.md
+
+4. Run smoke test:
+   node "<framework-home>/tools/smoke-test-framework.js" --root "<framework-home>"
+
+============================================================
+VALIDATE FRAMEWORK HEALTH (one-time, all tools)
+============================================================
 node "<framework-home>/tools/smoke-test-framework.js" --root "<framework-home>"
-
 Expected result: SMOKE TEST PASSED
 
---------------------------------------------------------------------
-6) Daily usage model
---------------------------------------------------------------------
-- Open any coding repo as usual.
-- In Copilot Chat, explicitly select सारथी (Saarthi).
-- Start work with /work-item-kickoff (or free-form request).
-- Code changes happen in the active coding repository.
-- Framework artifacts are centralized in:
-  <framework-home>/work-items/<WORK_ITEM_ID>/
+============================================================
+DAILY USAGE (all tools)
+============================================================
+1. Open any coding project as usual.
+2. Activate the Saarthi agent or paste the entry prompt.
+3. Start work with /work-item-kickoff or free-form:
+     Work Item ID: PROJ-123
+     Requirement: <your requirement>
+4. Code changes happen in your active project.
+5. Framework artifacts (work-item docs, decisions) are stored in:
+   <framework-home>/work-items/<WORK_ITEM_ID>/
 
-Work Item ID behavior:
-- If user provides ID: use it.
-- If missing: auto-generate WI-YYYYMMDD-short-title and create folder automatically.
-
---------------------------------------------------------------------
-7) Publish framework updates from a working copy to source-of-truth
---------------------------------------------------------------------
-Recommended: use publish scripts in <framework-home>/tools.
-
-A) Windows (PowerShell):
-powershell -ExecutionPolicy Bypass -File "<framework-home>\tools\publish-framework.ps1" -SourcePath "<working-copy-path>"
-
-B) Windows (CMD):
-"<framework-home>\tools\publish-framework.bat" "<working-copy-path>"
-
-C) macOS/Linux (bash):
-bash "<framework-home>/tools/publish-framework.sh" "<working-copy-path>" "<framework-home>"
-
-D) macOS/Linux (zsh):
-zsh "<framework-home>/tools/publish-framework.zsh" "<working-copy-path>" "<framework-home>"
-
-Guardrails in publish scripts:
-- If source structure similarity is below threshold, script asks for explicit YES confirmation.
-- Force override is available for intentional exceptions:
-  - PowerShell: -Force
-  - bat/bash/zsh: --force
-
-Post-publish behavior:
-- Scripts run smoke test automatically.
-- If smoke helper is missing, scripts run fallback validator help check.
-- Non-zero exit indicates publish or smoke-check failure.
-
---------------------------------------------------------------------
-8) Pre-done validation for each work item
---------------------------------------------------------------------
-Before accepting Done, run:
-
+============================================================
+VALIDATE WORK ITEMS BEFORE DONE
+============================================================
 node "<framework-home>/tools/validate-work-item.js" <WORK_ITEM_ID> --root "<framework-home>"
-
 Require exit code 0.
 
---------------------------------------------------------------------
-9) Recommended source-control pattern
---------------------------------------------------------------------
-- Keep one framework repo as your editable working copy.
-- Publish to <framework-home> after approved changes.
-- Optionally commit from working copy and tag versions.
-- Treat <framework-home> as local runtime source-of-truth for सारथी (Saarthi).
+============================================================
+PUBLISH FRAMEWORK UPDATES
+============================================================
+After editing the framework, publish using the included scripts:
 
---------------------------------------------------------------------
-10) Troubleshooting quick checks
---------------------------------------------------------------------
-- सारथी (Saarthi) missing in chat:
-  - Ensure saarthi.agent.md is in <user-prompts-root>
-  - Reload VS Code window
-- Prompt missing:
-  - Ensure *.prompt.md exists in <user-prompts-root>
-  - Reload VS Code window
-- Publish failed by guardrail:
-  - Re-check SourcePath; confirm it is the intended framework root
-- Validator/smoke failure:
-  - Check required files in <framework-home>
-  - Re-run publish from a correct working copy
+  macOS/Linux:  bash <framework-home>/tools/publish-framework.sh <working-copy> <framework-home>
+  Windows PS:   powershell -ExecutionPolicy Bypass -File <framework-home>\tools\publish-framework.ps1 -SourcePath <working-copy>
+  Windows CMD:  <framework-home>\tools\publish-framework.bat <working-copy>
+
+============================================================
+TROUBLESHOOTING
+============================================================
+- Agent/assistant not picking up the framework:
+    Ensure AGENTS.md (or the tool's equivalent) is in the project root
+    or the tool's custom instructions directory.
+- Smoke test fails:
+    Re-check that all files from saarthi-framework/ were copied correctly.
+    Re-run the publish script from a clean working copy.
+- Work item validation fails:
+    Ensure Node.js is installed and the framework home path is correct.
 
 END

@@ -1,8 +1,8 @@
 {
-  "name": "ai-agent-framework-mvp-v0.3-agents",
-  "version": "0.4.0-mvp",
-  "description": "Reusable agent-agnostic software engineering framework with AGENTS.md, autonomous work item lifecycle, an execution-verification loop with evidence-based quality gates, a machine-readable control plane (framework.config.yaml), an autonomy dial with operational safety rules, token/model optimization, knowledge-base indexing, and comprehensive artifact templates.",
-  "created_at_utc": "2026-06-30T07:17:59Z",
+  "name": "ai-agent-framework-mvp-v0.5-agents",
+  "version": "0.5.0",
+  "description": "Reusable agent-agnostic software engineering framework with multi-tool installation support, adaptive self-evolution (learns user preferences over time), MCP tool discovery and self-installation, AGENTS.md, autonomous work item lifecycle, an execution-verification loop with evidence-based quality gates, a machine-readable control plane (framework.config.yaml), an autonomy dial with operational safety rules, token/model optimization, knowledge-base indexing, and comprehensive artifact templates.",
+  "created_at_utc": "2026-07-15T06:31:40Z",
   "recommended_start_file": "AGENTS.md or _framework/00-single-entry-prompt.md",
   "control_plane": "framework.config.yaml",
   "files": [
@@ -25,6 +25,9 @@
     "_framework/12-work-item-lifecycle-policy.md",
     "_framework/13-execution-verification-loop.md",
     "_framework/14-autonomy-and-safety.md",
+    "_framework/15-multi-agent-orchestration.md",
+    "_framework/16-adaptive-learning.md",
+    "_framework/17-mcp-tool-discovery.md",
     "_framework/README.md",
     "knowledge-base/INDEX.md",
     "knowledge-base/architecture-decisions/ADR-template.md",
@@ -58,9 +61,12 @@
     "work-items/EXAMPLE-1001/work-item-summary.md"
   ],
   "notes": [
-    "AGENTS.md enables repo-level instructions for new chats/tools that can read repository files.",
-    "framework.config.yaml is the machine-readable source of truth for modes, model tiers, budgets, Definition of Done, and safety rules.",
+    "AGENTS.md enables repo-level instructions for all tools that can read repository files (GitHub Copilot, Claude Code, Cursor, Windsurf, Cline, Continue, Antigravity, and others).",
+    "saarthi.agent.md is the tool-agnostic custom agent configuration; it auto-resolves framework home across VS Code, Cursor, Claude Code, and more.",
+    "framework.config.yaml is the machine-readable source of truth for modes, model tiers, budgets, Definition of Done, safety rules, adaptive learning thresholds, and MCP server configuration.",
     "_framework/INDEX.md routes each decision to its canonical source and lists the always-on minimal core.",
+    "_framework/16-adaptive-learning.md governs self-evolution: learning user preferences, when to apply them silently vs confirm, and how to persist them in knowledge-base/preferences/.",
+    "_framework/17-mcp-tool-discovery.md governs MCP gap detection, registry research, recommendation, and self-installation with user confirmation.",
     "Provide Work Item ID in prompt to create/resume work-items/<WORK_ITEM_ID>/.",
     "Strict Mode is default; Prototype Mode only when explicitly requested.",
     "Verification commands are auto-discovered once per work item and cached in work-items/<ID>/verification-commands.yaml; not hard-coded.",

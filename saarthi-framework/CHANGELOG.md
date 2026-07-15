@@ -3,6 +3,62 @@
 All notable changes to the AI Agent Framework are documented here.
 The format is loosely based on Keep a Changelog. Versions track `manifest.json`.
 
+## [0.5.0] - 2026-07-15
+
+Focus: multi-tool installation, self-evolving framework, and MCP tool discovery.
+
+### Added
+- `_framework/16-adaptive-learning.md` — self-evolution policy: how the
+  framework learns coding styles, workflow preferences, technology choices, and
+  decision patterns from the user over time. Defines a confidence × criticality
+  matrix that governs whether a learned preference is applied silently, surfaced
+  as a default, or always confirmed (high-criticality decisions always require
+  explicit user confirmation, regardless of confidence level).
+- `_framework/17-mcp-tool-discovery.md` — MCP tool gap detection, registry
+  research (modelcontextprotocol.io, mcp.so, GitHub), tool selection criteria,
+  self-installation instructions per tool (VS Code, Cursor, Claude Code,
+  Windsurf, and generic fallback), post-install verification, a pre-vetted tool
+  catalog, and security/trust rules. Installation always requires user
+  confirmation.
+- `framework.config.yaml` — new `adaptive_learning` block with confidence
+  thresholds (low→medium at 2 observations, medium→high at 3), preference decay
+  days (90), always-confirm categories (security, auth, data-schema, infra,
+  ci-cd), and auto-extract-at-finalization flag.
+- `framework.config.yaml` — enhanced `mcp_servers` block with
+  `discovery_registries`, `prefer_official`, and
+  `require_user_confirmation_before_install` fields; added `package` field to
+  the GitHub server entry.
+
+### Changed
+- `saarthi.agent.md` — made truly tool-agnostic: framework home resolution now
+  lists concrete paths for GitHub Copilot (VS Code), Cursor, Claude Code,
+  Windsurf/Cline/Continue, Antigravity, and a generic fallback. Intake now
+  applies adaptive learning (16) and runs MCP capability check (17). Close step
+  now triggers adaptive learning extraction. References to new policies 16 & 17
+  added to framework binding and operating model.
+- `saarthi-framework/SETUP-CHECKLIST.txt` — expanded from VS Code-only to cover
+  all major tools: GitHub Copilot, Cursor, Claude Code (CLI), GitHub Copilot
+  CLI, Windsurf, Cline/Continue, Antigravity/Antigravity CLI, and generic tools.
+- `README.md` — added multi-tool installation guide section with per-tool steps
+  for all supported tools; added 🧠 self-evolving and 🔌 MCP discovery to Key
+  Features; updated directory structure to call out new framework files.
+- `knowledge-base/preferences/README.md` — added structured preference record
+  format (YAML front-matter with id, category, confidence, criticality, source,
+  observed_count, last_seen, examples), application rules table, and reference
+  to the full policy in `_framework/16-adaptive-learning.md`.
+- `_framework/INDEX.md` — added rows for 16 (adaptive learning) and 17 (MCP
+  discovery); updated load-on-demand order to include 16 at intake and finalize.
+- `manifest.json` — bumped to `0.5.0`, updated description, added new files,
+  expanded notes.
+
+### Preserved (intentionally unchanged in spirit)
+- Agent-agnostic `AGENTS.md` entry model.
+- P0/P1/P2 question policy and budgets.
+- Tiered ceremony philosophy and the six workflow modes.
+- Compliance/audit-upfront stance.
+- Execution-verification loop and evidence-backed DoD gates.
+- Hard safety rules (always confirm before destructive/irreversible actions).
+
 ## [0.4.0] - 2026-06-30
 
 Focus: close the execution-verification gap and make governance machine-checkable
