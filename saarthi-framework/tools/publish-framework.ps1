@@ -13,6 +13,15 @@ if ([string]::IsNullOrEmpty($DestinationPath)) {
 
 $ErrorActionPreference = "Stop"
 
+$PythonBin = $null
+if (Get-Command py -ErrorAction SilentlyContinue) {
+  $PythonBin = "py"
+} elseif (Get-Command python -ErrorAction SilentlyContinue) {
+  $PythonBin = "python"
+} else {
+  throw "Python 3 is required but was not found in PATH."
+}
+
 if (-not (Test-Path $SourcePath)) {
   throw "Source path not found: $SourcePath"
 }
@@ -63,7 +72,7 @@ Copy-Item -Path (Join-Path $SourcePath "*") -Destination $DestinationPath -Recur
 $required = @(
   "framework.config.yaml",
   "_framework\INDEX.md",
-  "tools\validate-work-item.js"
+  "tools\validate_work_item.py"
 )
 
 $missing = @()
@@ -83,22 +92,30 @@ if ($missing.Count -gt 0) {
 Write-Host "Publish successful." -ForegroundColor Green
 Write-Host "Source:      $SourcePath"
 Write-Host "Destination: $DestinationPath"
-Write-Host "Validator:   node \"$DestinationPath\tools\validate-work-item.js\" <WORK_ITEM_ID> --root \"$DestinationPath\""
+Write-Host "Validator:   $PythonBin `"$DestinationPath\tools\validate_work_item.py`" <WORK_ITEM_ID> --root `"$DestinationPath`""
 if ($Force) {
   Write-Host "Guardrail override was used (--Force)." -ForegroundColor Yellow
 }
 
 Write-Host "Running post-publish smoke test..." -ForegroundColor Cyan
-$smokeScript = Join-Path $DestinationPath "tools\smoke-test-framework.js"
+$smokeScript = Join-Path $DestinationPath "tools\smoke_test_framework.py"
 if (Test-Path $smokeScript) {
-  & node $smokeScript --root $DestinationPath
+  if ($PythonBin -eq "py") {
+    & py -3 $smokeScript --root $DestinationPath
+  } else {
+    & python $smokeScript --root $DestinationPath
+  }
   if ($LASTEXITCODE -ne 0) {
     Write-Host "Publish completed but smoke test failed." -ForegroundColor Yellow
     exit 3
   }
 } else {
   Write-Host "Smoke-test helper not found after publish; running fallback smoke check." -ForegroundColor Yellow
-  & node (Join-Path $DestinationPath "tools\validate-work-item.js") --help | Out-Null
+  if ($PythonBin -eq "py") {
+    & py -3 (Join-Path $DestinationPath "tools\validate_work_item.py") --help | Out-Null
+  } else {
+    & python (Join-Path $DestinationPath "tools\validate_work_item.py") --help | Out-Null
+  }
   if ($LASTEXITCODE -ne 0) {
     Write-Host "Publish completed but fallback smoke test failed." -ForegroundColor Yellow
     exit 3

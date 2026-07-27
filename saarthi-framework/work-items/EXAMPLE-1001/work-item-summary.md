@@ -53,6 +53,9 @@ L2
 - Unit tests: 148 passed, 0 failed (6 new)
 - Regression (existing suite): green (integration 37 passed, 0 failed)
 - Coverage delta: +1.4%
+- High-severity findings: none
+- Self-review: pass
+- Security gate: pass
 - Secret scan: 0 findings
 - Definition of Done profile: standard - met
 

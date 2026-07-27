@@ -28,10 +28,10 @@ Steps:
 2. Validate required files exist:
    - framework.config.yaml
    - _framework/INDEX.md
-   - tools/validate-work-item.js
+   - tools/validate_work_item.py
 3. Run post-publish smoke test automatically:
    - required-file checks
-   - `node tools/validate-work-item.js --help`
+   - `python tools/validate_work_item.py --help`
 4. Report publish + smoke-test status and any missing files.
 5. Show validator command template:
-   node "<destination>\tools\validate-work-item.js" <WORK_ITEM_ID> --root "<destination>"
+   python "<destination>\tools\validate_work_item.py" <WORK_ITEM_ID> --root "<destination>"

@@ -29,7 +29,7 @@ Framework binding (centralized, workspace-independent):
 	- `_framework/16-adaptive-learning.md`
 	- `_framework/17-mcp-tool-discovery.md`
 6. Enforce done claims with:
-	- `node "<framework-home>/tools/validate-work-item.js" <WORK_ITEM_ID> --root "<framework-home>"`
+	- `python "<framework-home>/tools/validate_work_item.py" <WORK_ITEM_ID> --root "<framework-home>"`
 	- Do not claim done unless validator passes.
 
 Operating model (framework-aligned):

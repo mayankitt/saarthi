@@ -21,6 +21,16 @@ if not exist "%SOURCE%" (
   exit /b 1
 )
 
+set "PYTHON_CMD="
+where py >nul 2>nul && set "PYTHON_CMD=py -3"
+if not defined PYTHON_CMD (
+  where python >nul 2>nul && set "PYTHON_CMD=python"
+)
+if not defined PYTHON_CMD (
+  echo Python 3 is required but was not found in PATH.
+  exit /b 1
+)
+
 for %%I in ("%SOURCE%") do set "SRCFULL=%%~fI"
 for %%I in ("%DEST%") do set "DESTFULL=%%~fI"
 if /I "%SRCFULL%"=="%DESTFULL%" (
@@ -54,7 +64,7 @@ xcopy "%SOURCE%\*" "%DEST%\" /E /I /Y >nul
 set "MISSING="
 if not exist "%DEST%\framework.config.yaml" set "MISSING=1"
 if not exist "%DEST%\_framework\INDEX.md" set "MISSING=1"
-if not exist "%DEST%\tools\validate-work-item.js" set "MISSING=1"
+if not exist "%DEST%\tools\validate_work_item.py" set "MISSING=1"
 
 if defined MISSING (
   echo Publish completed, but required files are missing.
@@ -64,19 +74,19 @@ if defined MISSING (
 echo Publish successful.
 echo Source:      %SOURCE%
 echo Destination: %DEST%
-echo Validator:   node "%DEST%\tools\validate-work-item.js" ^<WORK_ITEM_ID^> --root "%DEST%"
+echo Validator:   %PYTHON_CMD% "%DEST%\tools\validate_work_item.py" ^<WORK_ITEM_ID^> --root "%DEST%"
 if /I "%FORCE%"=="--force" echo Guardrail override was used (--force).
 
 echo Running post-publish smoke test...
-if exist "%DEST%\tools\smoke-test-framework.js" (
-  node "%DEST%\tools\smoke-test-framework.js" --root "%DEST%"
+if exist "%DEST%\tools\smoke_test_framework.py" (
+  call %PYTHON_CMD% "%DEST%\tools\smoke_test_framework.py" --root "%DEST%"
   if errorlevel 1 (
     echo Publish completed but smoke test failed.
     exit /b 3
   )
 ) else (
   echo Smoke-test helper not found after publish; running fallback smoke check.
-  node "%DEST%\tools\validate-work-item.js" --help >nul
+  call %PYTHON_CMD% "%DEST%\tools\validate_work_item.py" --help >nul
   if errorlevel 1 (
     echo Publish completed but fallback smoke test failed.
     exit /b 3

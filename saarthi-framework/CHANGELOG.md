@@ -3,6 +3,35 @@
 All notable changes to the AI Agent Framework are documented here.
 The format is loosely based on Keep a Changelog. Versions track `manifest.json`.
 
+## [0.6.0] - 2026-07-27
+
+Focus: Python-first validation, schema/config hardening, and more concrete orchestration fallback behavior.
+
+### Added
+- `framework.config.schema.json` — editor-facing JSON Schema for the canonical control plane.
+- `tools/framework_checks.py` — shared Python parsing and validation helpers for framework tooling.
+- `tools/validate_work_item.py` — Python replacement for work-item validation with more deterministic evidence parsing from the `Verification Evidence` section.
+- `tools/validate_framework.py` — framework/config validator that checks required files, schema JSON validity, config invariants, orchestration settings, and knowledge-base scaffolding.
+- `tools/smoke_test_framework.py` — Python smoke test for the framework bundle.
+- `tests/test_framework_validation.py` and `tests/test_policy_references.py` — automated tests for tool behavior, manifest integrity, and documented path references.
+- `.github/workflows/framework-validation.yml` — repo CI that runs the smoke test, framework validator, and Python unit tests on Ubuntu and Windows.
+- `framework.config.yaml` — new `orchestration` block for capability probing, orchestration levels, fallback order, and downgrade/escalation signals.
+- `framework.config.yaml` — `adaptive_learning.runtime_enforcement` block for index lookup, staleness revalidation, citation requirements, contradiction capture, and silent-application limits.
+
+### Changed
+- Validation and smoke-test commands throughout the repo now prefer Python instead of Node.js.
+- `framework.config.yaml` — added `cloud_balanced` and `local_medium` profiles plus an `ephemeral_task` budget entry.
+- `_framework/15-multi-agent-orchestration.md` — replaced high-level prose with concrete orchestration levels, fallback strategies, pseudo-parallel execution guidance, and a synchronization contract.
+- `_framework/16-adaptive-learning.md` — documented concrete runtime enforcement expectations for preference application and decay handling.
+- `_framework/17-mcp-tool-discovery.md` — added machine-checkable hardening guidance for MCP registry entries.
+- Publish scripts (`.sh`, `.zsh`, `.ps1`, `.bat`) now run Python-based validators/smoke tests.
+- `README.md`, `AGENTS.md`, `SETUP-CHECKLIST.txt`, `saarthi.agent.md`, and related prompts/docs now point to Python tooling.
+
+### Preserved (intentionally unchanged in spirit)
+- Knowledge-base content remains unseeded by default; only the scaffolding and validation expectations were strengthened.
+- Saarthi stays low-dependency and agent-agnostic.
+- Work-item evidence and verification remain mandatory before any "done" claim.
+
 ## [0.5.0] - 2026-07-15
 
 Focus: multi-tool installation, self-evolving framework, and MCP tool discovery.

@@ -21,7 +21,7 @@ Define:
 ============================================================
 PREREQUISITES (all tools)
 ============================================================
-- Node.js installed (for smoke test and validation scripts)
+- Python 3 installed (for smoke tests, schema validation, and work-item validation)
 - The AI coding tool of your choice installed and signed in
 
 ============================================================
@@ -51,7 +51,7 @@ A) GITHUB COPILOT (VS Code)
    - Slash prompts /work-item-kickoff and /saarthi-publish-to-central appear
 
 6. Run smoke test:
-   node "<framework-home>/tools/smoke-test-framework.js" --root "<framework-home>"
+   python "<framework-home>/tools/smoke_test_framework.py" --root "<framework-home>"
    Expected: SMOKE TEST PASSED
 
 ============================================================
@@ -79,7 +79,7 @@ Option 2 — Project-specific rules:
    when you start a conversation.
 
 7. Run smoke test from terminal:
-   node "<framework-home>/tools/smoke-test-framework.js" --root "<framework-home>"
+   python "<framework-home>/tools/smoke_test_framework.py" --root "<framework-home>"
 
 ============================================================
 C) CLAUDE CODE (CLI)
@@ -108,7 +108,7 @@ C) CLAUDE CODE (CLI)
    Framework instructions: see ~/.config/claude/saarthi-framework/AGENTS.md
 
 5. Run smoke test:
-   node "<framework-home>/tools/smoke-test-framework.js" --root "<framework-home>"
+   python "<framework-home>/tools/smoke_test_framework.py" --root "<framework-home>"
 
 ============================================================
 D) GITHUB COPILOT CLI (gh copilot)
@@ -133,7 +133,7 @@ D) GITHUB COPILOT CLI (gh copilot)
    (_framework/00a-distilled-entry-prompt.txt) at the start of sessions.
 
 5. Run smoke test:
-   node "<framework-home>/tools/smoke-test-framework.js" --root "<framework-home>"
+   python "<framework-home>/tools/smoke_test_framework.py" --root "<framework-home>"
 
 ============================================================
 E) WINDSURF
@@ -156,7 +156,7 @@ E) WINDSURF
    "Load the Saarthi framework from <framework-home>/AGENTS.md"
 
 5. Run smoke test:
-   node "<framework-home>/tools/smoke-test-framework.js" --root "<framework-home>"
+   python "<framework-home>/tools/smoke_test_framework.py" --root "<framework-home>"
 
 ============================================================
 F) CLINE / CONTINUE / OTHER TOOLS
@@ -179,7 +179,7 @@ F) CLINE / CONTINUE / OTHER TOOLS
    reference _framework/00-single-entry-prompt.md or paste its contents.
 
 5. Run smoke test:
-   node "<framework-home>/tools/smoke-test-framework.js" --root "<framework-home>"
+   python "<framework-home>/tools/smoke_test_framework.py" --root "<framework-home>"
 
 ============================================================
 G) ANTIGRAVITY / ANTIGRAVITY CLI
@@ -201,12 +201,12 @@ G) ANTIGRAVITY / ANTIGRAVITY CLI
    antigravity run --system-prompt <framework-home>/_framework/00-single-entry-prompt.md
 
 5. Run smoke test:
-   node "<framework-home>/tools/smoke-test-framework.js" --root "<framework-home>"
+   python "<framework-home>/tools/smoke_test_framework.py" --root "<framework-home>"
 
 ============================================================
 VALIDATE FRAMEWORK HEALTH (one-time, all tools)
 ============================================================
-node "<framework-home>/tools/smoke-test-framework.js" --root "<framework-home>"
+python "<framework-home>/tools/smoke_test_framework.py" --root "<framework-home>"
 Expected result: SMOKE TEST PASSED
 
 ============================================================
@@ -224,7 +224,7 @@ DAILY USAGE (all tools)
 ============================================================
 VALIDATE WORK ITEMS BEFORE DONE
 ============================================================
-node "<framework-home>/tools/validate-work-item.js" <WORK_ITEM_ID> --root "<framework-home>"
+python "<framework-home>/tools/validate_work_item.py" <WORK_ITEM_ID> --root "<framework-home>"
 Require exit code 0.
 
 ============================================================
@@ -246,6 +246,6 @@ TROUBLESHOOTING
     Re-check that all files from saarthi-framework/ were copied correctly.
     Re-run the publish script from a clean working copy.
 - Work item validation fails:
-    Ensure Node.js is installed and the framework home path is correct.
+    Ensure Python 3 is installed and the framework home path is correct.
 
 END

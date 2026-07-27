@@ -186,14 +186,90 @@ environment_profiles:
       description: "Cloud-hosted large models (e.g. GPT-4o, Claude 3.5 Sonnet)"
       max_parallel_agents: 5
       context_strategy: "full_history"
+      preferred_orchestration_level: "full"
+    cloud_balanced:
+      description: "Cloud-hosted models with moderate context/cost discipline"
+      max_parallel_agents: 3
+      context_strategy: "summarized_history"
+      preferred_orchestration_level: "balanced"
     local_large:
       description: "Local 14B-70B models"
       max_parallel_agents: 2
       context_strategy: "summarized_history"
+      preferred_orchestration_level: "balanced"
+    local_medium:
+      description: "Local 8B-14B models"
+      max_parallel_agents: 1
+      context_strategy: "contract_first"
+      preferred_orchestration_level: "lean"
     local_small:
       description: "Local 4B-8B models (e.g. Gemma 4B)"
       max_parallel_agents: 1
       context_strategy: "distilled_only" # Routes to 00a-distilled-entry-prompt.txt
+      preferred_orchestration_level: "minimal"
+
+# ---------------------------------------------------------------------------
+# Orchestration Levels & Capability Probe
+# Defines how much ceremony, parallelism, and context breadth Saarthi should use
+# after considering the environment profile and the loaded model's observed
+# capabilities. This lets the framework degrade gracefully instead of making a
+# binary jump between "full orchestration" and "distilled only".
+# ---------------------------------------------------------------------------
+orchestration:
+  default_level: "balanced"
+  fallback_order:
+    - "balanced"
+    - "lean"
+    - "minimal"
+  levels:
+    full:
+      description: "Full ceremony, parallel sub-agents when supported, full-history context."
+      allows_parallel_sub_agents: true
+      requires_contracts_for_parallel_work: true
+      context_strategy: "full_history"
+      question_style: "full_p0_p1_p2"
+    balanced:
+      description: "Normal default for capable models; use summaries first and parallelize only where the contract is clear."
+      allows_parallel_sub_agents: true
+      requires_contracts_for_parallel_work: true
+      context_strategy: "summarized_history"
+      question_style: "grouped_p0_p1_p2"
+    lean:
+      description: "Sequential or pseudo-parallel execution with strict context trimming and fewer concurrent responsibilities."
+      allows_parallel_sub_agents: false
+      requires_contracts_for_parallel_work: true
+      context_strategy: "contract_first"
+      question_style: "p0_first_then_p1"
+    minimal:
+      description: "Distilled mode for weak/local models; no parallelism, no optional ceremony, only essential gates."
+      allows_parallel_sub_agents: false
+      requires_contracts_for_parallel_work: false
+      context_strategy: "distilled_only"
+      question_style: "p0_only_unless_safe"
+  capability_probe:
+    enabled: true
+    probe_dimensions:
+      structured_output: 20
+      multi_step_follow_through: 20
+      tool_recall: 15
+      verification_discipline: 15
+      context_retention: 15
+      parallel_coordination: 15
+    thresholds:
+      full: 85
+      balanced: 65
+      lean: 45
+      minimal: 0
+    degrade_signals:
+      - "Drops required response sections twice in the same work item."
+      - "Loses track of the active artifact or verification command cache."
+      - "Fails to preserve sub-task contracts or handoff boundaries."
+      - "Needs repeated re-asking for the same context because recall is weak."
+    escalate_signals:
+      - "Sustains structured outputs across multiple turns without drift."
+      - "Executes verification loops correctly without skipping evidence."
+      - "Can reason over summaries/contracts without reloading full history."
+      - "Handles sequential decomposition cleanly even when parallel spawn is unavailable."
 
 # ---------------------------------------------------------------------------
 # MCP Servers & Capabilities (Tool Integration)
@@ -253,6 +329,12 @@ adaptive_learning:
   auto_extract_at_finalization: true
   # Surface medium-confidence preferences as pre-selected P2 defaults at intake.
   surface_as_defaults_at_intake: true
+  runtime_enforcement:
+    require_index_lookup_at_intake: true
+    revalidate_stale_preferences_at_intake: true
+    require_citation_when_applying_preferences: true
+    record_contradictions_in_summary: true
+    max_silent_applications_per_task: 3
 
 # ---------------------------------------------------------------------------
 # Execution modes (how autonomous the agent should be)
@@ -404,6 +486,7 @@ workflow_modes:
 budgets:
   unit: "approx_tokens"
   modes:
+    ephemeral_task:       { soft_cap: 8000,   stop_and_report_at: 16000 }
     micro_task:           { soft_cap: 15000,  stop_and_report_at: 30000 }
     small_task:           { soft_cap: 40000,  stop_and_report_at: 80000 }
     standard_feature:     { soft_cap: 120000, stop_and_report_at: 220000 }

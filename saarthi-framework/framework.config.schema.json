@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Saarthi Framework Config",
+  "type": "object",
+  "required": [
+    "version",
+    "agent_context",
+    "environment_profiles",
+    "orchestration",
+    "mcp_servers",
+    "adaptive_learning",
+    "autonomy",
+    "models",
+    "workflow_modes",
+    "budgets",
+    "verification",
+    "definition_of_done",
+    "safety"
+  ],
+  "properties": {
+    "version": {
+      "type": "string"
+    },
+    "agent_context": {
+      "type": "object",
+      "required": ["active_agent", "agent_aware_search", "known_agents"],
+      "properties": {
+        "active_agent": {
+          "enum": [
+            "github_copilot",
+            "claude_code",
+            "cursor",
+            "windsurf",
+            "cline",
+            "continue",
+            "antigravity",
+            "generic"
+          ]
+        },
+        "agent_aware_search": {
+          "type": "boolean"
+        },
+        "known_agents": {
+          "type": "object",
+          "minProperties": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "environment_profiles": {
+      "type": "object",
+      "required": ["active", "profiles"],
+      "properties": {
+        "active": {
+          "type": "string"
+        },
+        "profiles": {
+          "type": "object",
+          "minProperties": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "orchestration": {
+      "type": "object",
+      "required": ["default_level", "levels", "fallback_order", "capability_probe"],
+      "additionalProperties": true
+    },
+    "mcp_servers": {
+      "type": "object",
+      "required": ["self_onboarding_enabled", "discovery_registries", "prefer_official", "require_user_confirmation_before_install", "servers"],
+      "additionalProperties": true
+    },
+    "adaptive_learning": {
+      "type": "object",
+      "required": ["enabled", "confidence_thresholds", "preference_decay_days", "always_confirm_categories", "runtime_enforcement"],
+      "additionalProperties": true
+    },
+    "autonomy": {
+      "type": "object",
+      "required": ["default_level", "levels"],
+      "additionalProperties": true
+    },
+    "models": {
+      "type": "object",
+      "required": ["selection", "tier_map", "rules"],
+      "properties": {
+        "selection": {
+          "enum": ["auto", "fixed"]
+        }
+      },
+      "additionalProperties": true
+    },
+    "workflow_modes": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "required": ["risk", "question_budget", "response_size", "model_tier", "dod_profile"]
+      }
+    },
+    "budgets": {
+      "type": "object",
+      "required": ["unit", "modes", "rules"],
+      "additionalProperties": true
+    },
+    "verification": {
+      "type": "object",
+      "required": ["discovery", "evidence_required", "max_fix_iterations"],
+      "additionalProperties": true
+    },
+    "definition_of_done": {
+      "type": "object",
+      "required": ["profiles"],
+      "additionalProperties": true
+    },
+    "safety": {
+      "type": "object",
+      "required": ["always_confirm_before", "never_without_explicit_flag", "on_secret_detected"],
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}
