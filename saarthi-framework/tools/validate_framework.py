@@ -24,6 +24,7 @@ REQUIRED_TOP_LEVEL_KEYS = {
     "verification",
     "definition_of_done",
     "safety",
+    "saarthi_observability",
 }
 
 KNOWN_AGENTS = {
@@ -196,6 +197,35 @@ def validate_config(root: Path) -> list[tuple[str, bool, str]]:
                 f"Found: {', '.join(sorted(server_keys))}",
             )
         )
+
+    # Capability aliases: each alias must resolve to a known tier key
+    alias_keys = child_keys(entries, ("models", "capability_aliases"))
+    checks.append(
+        (
+            "capability aliases declared",
+            {"fast", "standard", "reasoning", "expert"}.issubset(alias_keys),
+            f"Found: {', '.join(sorted(alias_keys))}",
+        )
+    )
+    for alias in sorted(alias_keys):
+        alias_target = values.get(("models", "capability_aliases", alias), "").strip('"')
+        checks.append(
+            (
+                f"capability alias {alias!r} → tier",
+                alias_target in tier_map,
+                alias_target or "missing",
+            )
+        )
+
+    # Saarthi observability block
+    observability_keys = child_keys(entries, ("saarthi_observability",))
+    checks.append(
+        (
+            "saarthi_observability config",
+            {"enabled", "log_file", "log_events", "redact_sensitive_values"}.issubset(observability_keys),
+            f"Found: {', '.join(sorted(observability_keys))}",
+        )
+    )
 
     return checks
 

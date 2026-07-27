@@ -3,7 +3,31 @@
 All notable changes to the AI Agent Framework are documented here.
 The format is loosely based on Keep a Changelog. Versions track `manifest.json`.
 
-## [0.6.0] - 2026-07-27
+## [0.7.0] - 2026-07-27
+
+Focus: KB auditor, capability-probe script, capability model aliases, and Saarthi observability log.
+
+### Added
+- `tools/audit_kb.py` — knowledge-base auditor: scans `knowledge-base/` for orphaned files (on disk but not in INDEX.md), dead links (in INDEX.md but missing on disk), preference files with missing or malformed YAML front-matter, and stale preferences (last_seen older than `preference_decay_days` from config). Supports `--stale-only` flag for quick staleness checks.
+- `tools/run_capability_probe.py` — capability-probe execution script: reads `orchestration.capability_probe` dimensions and thresholds from `framework.config.yaml`, accepts per-dimension scores interactively or via `--scores dim=N,...`, computes a normalized score, and recommends the appropriate orchestration level (full/balanced/lean/minimal). Optionally writes `probe-result.yaml` via `--output`.
+- `_framework/18-saarthi-observability.md` — lightweight per-work-item debug log design for Saarthi's own decisions: log location, entry format, canonical event names (`intake_started`, `mode_classified`, `probe_result`, `kb_hit`, `preference_applied`, `budget_alarm`, `gate_result`, `tool_invoked`, `orchestration_downgrade`, `work_item_closed`), when to emit, and privacy/sensitivity rules.
+- `framework.config.yaml` — `models.capability_aliases` block mapping human-readable aliases (`fast`, `standard`, `reasoning`, `expert`) to tier keys (`tier_1_light` … `tier_4_specialist`).
+- `framework.config.yaml` — `saarthi_observability` top-level block: `enabled`, `log_file`, `log_events`, `include_timestamps`, `redact_sensitive_values`.
+
+### Changed
+- `_framework/07-model-selection-policy.md` — added "Capability Aliases" section with an alias/tier/use-for table; renamed tier headings to include the alias (e.g. "Tier 1 — `fast`"); updated rules to prefer aliases in prose.
+- `_framework/INDEX.md` — added row for 18 (Saarthi observability); updated intake load-on-demand note to include 18 and the capability probe tool.
+- `tools/validate_framework.py` — added checks for `models.capability_aliases` (all four aliases declared and each resolves to a known tier) and `saarthi_observability` (required keys present).
+- `tools/smoke_test_framework.py` — includes `tools/audit_kb.py` and `tools/run_capability_probe.py` in both the required-files check and the `--help` smoke run.
+- `framework.config.schema.json` — added `saarthi_observability` to `required` and its property definition.
+- `manifest.json` — bumped to `0.7.0`; added new files; updated notes.
+
+### Preserved (intentionally unchanged in spirit)
+- Agent-agnostic framework identity and operating model.
+- Knowledge-base remains unseeded by default; audit script works on whatever content exists.
+- Capability probe thresholds and dimensions are fully configurable via `framework.config.yaml`.
+
+
 
 Focus: Python-first validation, schema/config hardening, and more concrete orchestration fallback behavior.
 

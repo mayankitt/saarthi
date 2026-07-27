@@ -23,7 +23,7 @@
 #   4. Adjust `definition_of_done.*` thresholds to your standards.
 #   5. Everything else can stay as shipped defaults.
 
-version: "0.5.0"
+version: "0.7.0"
 
 # ---------------------------------------------------------------------------
 # Agent Context (Coding-Agent Awareness)
@@ -385,10 +385,19 @@ models:
     tier_2_standard: "claude-haiku-4.5"  # e.g. balanced model
     tier_3_heavy: "claude-sonnet-4.6"
     tier_4_specialist: "claude-opus-4.8"  # e.g. expert-level model
+  # Capability aliases — human-readable names that map to tier keys.
+  # Use aliases in prompts, policies, and agent configs for clarity.
+  # The orchestrator resolves an alias to its tier key, then to the model.
+  capability_aliases:
+    fast: tier_1_light           # Small/fast: formatting, renaming, boilerplate
+    standard: tier_2_standard    # Normal feature work, code review, test generation
+    reasoning: tier_3_heavy      # Architecture, complex debugging, cross-system design
+    expert: tier_4_specialist    # Final review, security threat model, compliance audit
   rules:
-    - "Use the cheapest tier that can safely do the job."
+    - "Use the cheapest tier (or alias) that can safely do the job."
     - "Escalate only with a stated reason; de-escalate when the task simplifies."
     - "Heavier tiers for design/review; lighter tiers for repetitive implementation."
+    - "Capability aliases (fast/standard/reasoning/expert) are preferred in prose; tier keys are the canonical reference in config."
 
 # ---------------------------------------------------------------------------
 # Workflow modes. Source of truth for leads / artifacts / budgets.
@@ -603,3 +612,28 @@ safety:
     - "Logging secrets, tokens, PII, or credentials."
     - "Committing secrets or .env files."
   on_secret_detected: "Stop, do not commit, alert the user, and recommend rotation."
+
+# ---------------------------------------------------------------------------
+# Saarthi Observability & Debug Log
+# Controls the lightweight per-work-item log of Saarthi's own decisions.
+# Full design: _framework/18-saarthi-observability.md
+# ---------------------------------------------------------------------------
+saarthi_observability:
+  enabled: true
+  # Log file path, relative to work-items/<WORK_ITEM_ID>/
+  log_file: "saarthi-debug.log.md"
+  # Canonical event names to emit; comment out any you want to suppress.
+  log_events:
+    - intake_started
+    - mode_classified
+    - probe_result
+    - kb_hit
+    - preference_applied
+    - budget_alarm
+    - gate_result
+    - tool_invoked
+    - orchestration_downgrade
+    - work_item_closed
+  include_timestamps: true
+  # Replace any value matching a secret pattern with "[REDACTED]"
+  redact_sensitive_values: true

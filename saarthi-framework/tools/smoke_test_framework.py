@@ -31,6 +31,8 @@ def main(argv: list[str]) -> int:
         "_framework/INDEX.md",
         "tools/validate_work_item.py",
         "tools/validate_framework.py",
+        "tools/audit_kb.py",
+        "tools/run_capability_probe.py",
     ]
     checks = []
     for rel_path in required_paths:
@@ -39,7 +41,12 @@ def main(argv: list[str]) -> int:
     print_checks("Smoke test: required files", checks)
     ok = all(item[1] for item in checks)
 
-    for tool_rel_path in ("tools/validate_work_item.py", "tools/validate_framework.py"):
+    for tool_rel_path in (
+        "tools/validate_work_item.py",
+        "tools/validate_framework.py",
+        "tools/audit_kb.py",
+        "tools/run_capability_probe.py",
+    ):
         tool_path = root / tool_rel_path
         if not tool_path.exists():
             ok = False

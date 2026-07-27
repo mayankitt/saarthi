@@ -15,7 +15,8 @@
     "budgets",
     "verification",
     "definition_of_done",
-    "safety"
+    "safety",
+    "saarthi_observability"
   ],
   "properties": {
     "version": {
@@ -117,6 +118,18 @@
     "safety": {
       "type": "object",
       "required": ["always_confirm_before", "never_without_explicit_flag", "on_secret_detected"],
+      "additionalProperties": true
+    },
+    "saarthi_observability": {
+      "type": "object",
+      "required": ["enabled", "log_file", "log_events", "redact_sensitive_values"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "log_file": { "type": "string" },
+        "log_events": { "type": "array", "items": { "type": "string" } },
+        "include_timestamps": { "type": "boolean" },
+        "redact_sensitive_values": { "type": "boolean" }
+      },
       "additionalProperties": true
     }
   },
