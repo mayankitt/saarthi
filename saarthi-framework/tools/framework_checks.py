@@ -41,6 +41,8 @@ def strip_inline_comment(value: str) -> str:
     return "".join(result).strip()
 
 
+# Dots are allowed because config keys may use dotted names in future extensions,
+# and the scanner is intentionally a little more permissive than the current file.
 KEY_RE = re.compile(r"^(?P<indent>\s*)(?P<key>[A-Za-z0-9_.-]+):(?:\s*(?P<value>.*))?$")
 
 
@@ -164,7 +166,7 @@ def parse_verification_cache(cache_text: str) -> dict[str, object]:
         elif stripped == "commands:":
             in_commands = True
         elif in_commands:
-            match = re.match(r"^\s{2}([a-z_]+):\s*\"?(.*?)\"?\s*$", line)
+            match = re.match(r"^\s+([a-z_]+):\s*\"?(.*?)\"?\s*$", line)
             if match:
                 commands[match.group(1)] = match.group(2).strip()
             elif re.match(r"^\S", line) or re.match(r"^\s*[A-Za-z0-9_.-]+:\s*$", line):

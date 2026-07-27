@@ -67,19 +67,19 @@ def validate_requirement(
     if key == "no_new_high_severity_findings":
         value = evidence_lookup(evidence, "high severity findings", "high-severity findings")
         if value is None:
-            value = "yes" if re_search(r"\b(no new high[- ]severity findings|0 high[- ]severity findings|none)\b", combined_text) else None
+            value = "yes" if re_search(r"\b(no new high[\s-]severity findings|0 high[\s-]severity findings|none)\b", combined_text) else None
         return evidence_is_positive(value), f"High-severity findings evidence: {value or 'missing'}"
 
     if key == "self_review_passed":
         value = evidence_lookup(evidence, "self-review", "self review")
         if value is None:
-            value = "pass" if re_search(r"\bself[- ]review\b.*\b(pass|passed|approved)\b", combined_text) else None
+            value = "pass" if re_search(r"^\s*-\s*self[\s-]review:\s*(pass|passed|approved)\b", combined_text, multiline=True) else None
         return evidence_is_positive(value), f"Self-review evidence: {value or 'missing'}"
 
     if key == "security_gate_passed":
         value = evidence_lookup(evidence, "security gate", "security recommendation")
         if value is None:
-            value = "pass" if re_search(r"\bsecurity gate\b.*\b(pass|passed|approved)\b", combined_text) else None
+            value = "pass" if re_search(r"^\s*-\s*security gate:\s*(pass|passed|approved)\b", combined_text, multiline=True) else None
         return evidence_is_positive(value), f"Security gate evidence: {value or 'missing'}"
 
     if key == "secret_scan_clean":
@@ -100,10 +100,11 @@ def validate_requirement(
     return True, f"{key} not currently validated by script"
 
 
-def re_search(pattern: str, text: str) -> bool:
+def re_search(pattern: str, text: str, *, multiline: bool = False) -> bool:
     import re
 
-    return bool(re.search(pattern, text, re.IGNORECASE))
+    flags = re.IGNORECASE | (re.MULTILINE if multiline else 0)
+    return bool(re.search(pattern, text, flags))
 
 
 def print_result(title: str, items: list[tuple[str, bool, str]]) -> None:

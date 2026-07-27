@@ -486,6 +486,8 @@ workflow_modes:
 budgets:
   unit: "approx_tokens"
   modes:
+    # Ephemeral tasks usually finish quickly, but a small budget helps detect
+    # runaway clarification loops or repeated prompt rework.
     ephemeral_task:       { soft_cap: 8000,   stop_and_report_at: 16000 }
     micro_task:           { soft_cap: 15000,  stop_and_report_at: 30000 }
     small_task:           { soft_cap: 40000,  stop_and_report_at: 80000 }

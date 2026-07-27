@@ -9,6 +9,8 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[2]
 FRAMEWORK_ROOT = REPO_ROOT / "saarthi-framework"
 PATH_PATTERN = re.compile(
+    # Framework-relative file references that should resolve from either the repo
+    # root or the framework root depending on where they are documented.
     r"(?P<path>(?:saarthi-framework/)?(?:_framework|knowledge-base|templates|tools|work-items)/[A-Za-z0-9._/\-]+\.[A-Za-z0-9._-]+|"
     r"(?:saarthi-framework/)?framework\.config(?:\.schema)?\.json|"
     r"(?:saarthi-framework/)?framework\.config\.yaml|"
