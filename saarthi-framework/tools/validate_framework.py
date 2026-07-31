@@ -211,7 +211,7 @@ def validate_config(root: Path) -> list[tuple[str, bool, str]]:
         alias_target = values.get(("models", "capability_aliases", alias), "").strip('"')
         checks.append(
             (
-                f"capability alias {alias!r} → tier",
+                f"capability alias {alias!r} -> tier",
                 alias_target in tier_map,
                 alias_target or "missing",
             )
