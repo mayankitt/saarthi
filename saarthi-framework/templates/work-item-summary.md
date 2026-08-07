@@ -46,6 +46,9 @@ L1 / L2 / L3
 - Unit tests: <passed/failed counts>
 - Regression (existing suite): <result>
 - Coverage delta: <+/- %>
+- High-severity findings: <none / findings summary>
+- Self-review: <pass / pass-with-notes / fail>
+- Security gate: <pass / n/a>
 - Secret scan: <findings>
 - Definition of Done profile: <light/standard/strict/prototype> - <met? >
 

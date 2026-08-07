@@ -46,7 +46,7 @@ A fully populated end-to-end example lives in `work-items/EXAMPLE-1001/`.
 Before closing any work item, run:
 
 ```text
-node tools/validate-work-item.js <WORK_ITEM_ID>
+python tools/validate_work_item.py <WORK_ITEM_ID> --root .
 ```
 
 and require a pass.

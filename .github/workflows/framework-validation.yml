@@ -1,0 +1,35 @@
+name: Framework validation
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+
+jobs:
+  validate:
+    permissions:
+      contents: read
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run framework smoke test
+        run: python saarthi-framework/tools/smoke_test_framework.py --root saarthi-framework
+
+      - name: Run framework validator
+        run: python saarthi-framework/tools/validate_framework.py --root saarthi-framework
+
+      - name: Run framework unit tests
+        run: python -m unittest discover -s saarthi-framework/tests -v
