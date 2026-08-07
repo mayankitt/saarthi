@@ -84,14 +84,14 @@
     },
     "models": {
       "type": "object",
-      "required": ["selection", "tier_map", "rules"],
+      "required": ["selection", "tier_map", "capability_aliases", "rules"],
       "properties": {
         "selection": {
           "enum": ["auto", "fixed"]
         }
       },
       "additionalProperties": true
-    },
+    }
     "workflow_modes": {
       "type": "object",
       "minProperties": 1,

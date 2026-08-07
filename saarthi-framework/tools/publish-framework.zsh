@@ -6,7 +6,7 @@ DEFAULT_DEST="$( cd "$SCRIPT_DIR/.." >/dev/null 2>&1 && pwd )"
 
 if command -v python3 >/dev/null 2>&1; then
   PYTHON_BIN="python3"
-elif command -v python >/dev/null 2>&1; then
+elif command -v python >/dev/null 2>&1 && python -c 'import sys; raise SystemExit(0 if sys.version_info[0] == 3 else 1)' >/dev/null 2>&1; then
   PYTHON_BIN="python"
 else
   echo "Python 3 is required but was not found in PATH."

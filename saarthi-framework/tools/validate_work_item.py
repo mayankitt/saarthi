@@ -57,7 +57,7 @@ def validate_requirement(
 
     if key == "new_tests_required":
         value = evidence_lookup(evidence, "unit tests")
-        ok = bool(value and ("new" in value.lower() or evidence_is_positive(value)))
+        ok = bool(value and re_search(r"\b(new\s+tests?|added\s+[1-9]\d*|\(?\s*[1-9]\d*\s+new\b)", value))
         return ok, f"New test evidence: {value or 'missing'}"
 
     if key == "regression_suite_green":
@@ -67,7 +67,7 @@ def validate_requirement(
     if key == "no_new_high_severity_findings":
         value = evidence_lookup(evidence, "high severity findings", "high-severity findings")
         if value is None:
-            value = "yes" if re_search(r"\b(no new high[\s-]severity findings|0 high[\s-]severity findings|none)\b", combined_text) else None
+            value = "yes" if re_search(r"\b(no\s+new\s+high[\s-]severity\s+findings|0\s+high[\s-]severity\s+findings|high[\s-]severity\s+findings:\s*none)\b", combined_text) else None
         return evidence_is_positive(value), f"High-severity findings evidence: {value or 'missing'}"
 
     if key == "self_review_passed":

@@ -27,10 +27,9 @@ Focus: KB auditor, capability-probe script, capability model aliases, and Saarth
 - Knowledge-base remains unseeded by default; audit script works on whatever content exists.
 - Capability probe thresholds and dimensions are fully configurable via `framework.config.yaml`.
 
-
+## [0.6.0]
 
 Focus: Python-first validation, schema/config hardening, and more concrete orchestration fallback behavior.
-
 ### Added
 - `framework.config.schema.json` — editor-facing JSON Schema for the canonical control plane.
 - `tools/framework_checks.py` — shared Python parsing and validation helpers for framework tooling.
