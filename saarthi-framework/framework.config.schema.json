@@ -91,7 +91,7 @@
         }
       },
       "additionalProperties": true
-    }
+    },
     "workflow_modes": {
       "type": "object",
       "minProperties": 1,

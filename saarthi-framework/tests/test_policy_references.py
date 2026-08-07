@@ -20,12 +20,13 @@ PATH_PATTERN = re.compile(
 
 
 def candidate_targets(current_file: Path, raw_path: str) -> list[Path]:
-    targets = [current_file.parent / raw_path]
-    if raw_path.startswith("saarthi-framework/"):
-        targets.append(REPO_ROOT / raw_path)
+    normalized_path = raw_path.replace("\\", "/")
+    targets = [current_file.parent / normalized_path]
+    if normalized_path.startswith("saarthi-framework/"):
+        targets.append(REPO_ROOT / normalized_path)
     else:
-        targets.append(FRAMEWORK_ROOT / raw_path)
-        targets.append(REPO_ROOT / raw_path)
+        targets.append(FRAMEWORK_ROOT / normalized_path)
+        targets.append(REPO_ROOT / normalized_path)
     deduped = []
     seen = set()
     for target in targets:
