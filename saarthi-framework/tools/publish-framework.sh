@@ -4,6 +4,15 @@ set -euo pipefail
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 DEFAULT_DEST="$( cd "$SCRIPT_DIR/.." >/dev/null 2>&1 && pwd )"
 
+if command -v python3 >/dev/null 2>&1; then
+  PYTHON_BIN="python3"
+elif command -v python >/dev/null 2>&1 && python -c 'import sys; raise SystemExit(0 if sys.version_info[0] == 3 else 1)' >/dev/null 2>&1; then
+  PYTHON_BIN="python"
+else
+  echo "Python 3 is required but was not found in PATH."
+  exit 1
+fi
+
 SOURCE_PATH="${1:-}"
 DESTINATION_PATH="${2:-$DEFAULT_DEST}"
 FORCE_FLAG="${3:-}"
@@ -65,7 +74,7 @@ cp -R "$SOURCE_PATH"/. "$DESTINATION_PATH"/
 missing=0
 [[ -e "$DESTINATION_PATH/framework.config.yaml" ]] || missing=1
 [[ -e "$DESTINATION_PATH/_framework/INDEX.md" ]] || missing=1
-[[ -e "$DESTINATION_PATH/tools/validate-work-item.js" ]] || missing=1
+[[ -e "$DESTINATION_PATH/tools/validate_work_item.py" ]] || missing=1
 
 if [[ $missing -ne 0 ]]; then
   echo "Publish completed, but required files are missing."
@@ -75,17 +84,17 @@ fi
 echo "Publish successful."
 echo "Source:      $SOURCE_PATH"
 echo "Destination: $DESTINATION_PATH"
-echo "Validator:   node \"$DESTINATION_PATH/tools/validate-work-item.js\" <WORK_ITEM_ID> --root \"$DESTINATION_PATH\""
+echo "Validator:   $PYTHON_BIN \"$DESTINATION_PATH/tools/validate_work_item.py\" <WORK_ITEM_ID> --root \"$DESTINATION_PATH\""
 if [[ "$FORCE_FLAG" == "--force" ]]; then
   echo "Guardrail override was used (--force)."
 fi
 
 echo "Running post-publish smoke test..."
-if [[ -e "$DESTINATION_PATH/tools/smoke-test-framework.js" ]]; then
-  node "$DESTINATION_PATH/tools/smoke-test-framework.js" --root "$DESTINATION_PATH"
+if [[ -e "$DESTINATION_PATH/tools/smoke_test_framework.py" ]]; then
+  "$PYTHON_BIN" "$DESTINATION_PATH/tools/smoke_test_framework.py" --root "$DESTINATION_PATH"
 else
   echo "Smoke-test helper not found after publish; running fallback smoke check."
-  node "$DESTINATION_PATH/tools/validate-work-item.js" --help >/dev/null
+  "$PYTHON_BIN" "$DESTINATION_PATH/tools/validate_work_item.py" --help >/dev/null
 fi
 
 echo "Post-publish smoke test passed."

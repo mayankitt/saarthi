@@ -107,6 +107,19 @@ At the start of each new work item (intake phase):
    (pre-selected, easy to override).
 5. Never auto-apply high-criticality preferences — always confirm.
 
+### Runtime enforcement
+
+To keep this from becoming aspirational prose only, the framework should enforce:
+
+1. **Index lookup at intake** — read `knowledge-base/INDEX.md` before applying any stored preference.
+2. **Citation requirement** — when a preference is applied automatically, cite the preference entry or user input in the decision register or summary.
+3. **Staleness revalidation** — if `last_seen` is older than `preference_decay_days`, ask once whether the preference still applies.
+4. **Contradiction capture** — if the user overrides a stored preference, record the contradiction in `work-item-summary.md` and downgrade confidence per policy.
+5. **Silent-application cap** — do not auto-apply an unbounded number of preferences in one task; keep the behavior understandable and auditable.
+
+The machine-readable knobs for these checks live under
+`adaptive_learning.runtime_enforcement` in `framework.config.yaml`.
+
 ---
 
 ## 6. Preference Learning During Finalization
@@ -135,6 +148,9 @@ For each candidate:
   the new value and reset confidence to `medium`.
 - Preferences that have not been seen in 90+ days should be flagged for review
   at the next relevant task (ask once: "Still prefer X?").
+
+The framework validation tooling should additionally flag malformed or stale
+preference records so the knowledge base does not silently drift.
 
 ---
 

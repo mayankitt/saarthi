@@ -68,6 +68,10 @@ From the task classification, determine what external capabilities would help:
 Read `framework.config.yaml` `mcp_servers.servers` to see what is already
 registered and available.
 
+As a framework hardening step, keep this registry machine-checkable. The Python
+framework validator should fail if a declared server entry is structurally
+incomplete or if required discovery settings are missing from the config.
+
 ### Step 3 — Research missing tools (agent-qualified)
 
 For each capability gap without a registered tool:
@@ -217,6 +221,9 @@ After installation:
        package: "<package-name>"
        installed_for: "<active_agent>"   # e.g. "github_copilot"
    ```
+
+For repository health, add automated validation around the discovery policy and
+registry structure even if live registry lookup is only possible at runtime.
 
 ---
 

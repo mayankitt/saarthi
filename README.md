@@ -44,7 +44,7 @@ saarthi/
 ## Quick Start
 
 ### Prerequisites
-- **Node.js** (for validation and smoke-test scripts)
+- **Python 3** (for validation, schema checks, and smoke-test scripts)
 - Any supported AI coding tool (see installation guide below)
 
 ### Installation Guide
@@ -146,9 +146,10 @@ The framework loads automatically when you start an AI conversation in Cursor.
 #### Validate your installation (all tools)
 
 ```bash
-node saarthi-framework/tools/smoke-test-framework.js --root saarthi-framework
+python saarthi-framework/tools/smoke_test_framework.py --root saarthi-framework
+python saarthi-framework/tools/validate_framework.py --root saarthi-framework
 ```
-Expected: `SMOKE TEST PASSED`
+Expected: `SMOKE TEST PASSED` and `FRAMEWORK VALIDATION PASSED`
 
 For detailed per-tool instructions, see [saarthi-framework/SETUP-CHECKLIST.txt](saarthi-framework/SETUP-CHECKLIST.txt).
 
@@ -173,7 +174,7 @@ As changes are implemented, the agent runs the execution-verification loop:
 ### Phase 3: Done Validation
 Before the agent claims a task is "done", verify the work item by running:
 ```bash
-node saarthi-framework/tools/validate-work-item.js JIRA-1234
+python saarthi-framework/tools/validate_work_item.py JIRA-1234 --root saarthi-framework
 ```
 A successful validation (exit code `0`) is required to close the work item.
 

@@ -64,7 +64,7 @@ Record evidence in `work-item-summary.md` under **Verification Evidence**.
 Before claiming done, run the validator:
 
 ```text
-node tools/validate-work-item.js <WORK_ITEM_ID>
+python tools/validate_work_item.py <WORK_ITEM_ID> --root .
 ```
 
 If it fails, the work item is not done.
@@ -107,7 +107,7 @@ The current workflow mode maps to a `dod_profile` in `framework.config.yaml`.
 A work item is done only when every required field in that profile is satisfied
 **with evidence**. Empty/"n/a" commands are skipped, not failed.
 
-`tools/validate-work-item.js` enforces this by checking:
+`tools/validate_work_item.py` enforces this by checking:
 
 - required artifacts exist (`work-item-summary.md`, `test-plan.md`, `verification-commands.yaml`)
 - DoD profile is present

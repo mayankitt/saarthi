@@ -196,7 +196,7 @@ _framework/13-execution-verification-loop.md
 - A "done" claim must include **pasted command output** as evidence; never
   self-report green. The binding pass/fail criteria are the
   `definition_of_done` profiles in `framework.config.yaml`.
-- Before any "done" claim, run `node tools/validate-work-item.js <WORK_ITEM_ID>`
+- Before any "done" claim, run `python tools/validate_work_item.py <WORK_ITEM_ID> --root .`
   and require a pass.
 - Never delete, skip, or weaken failing tests to force a gate.
 

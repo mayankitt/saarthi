@@ -122,7 +122,7 @@ Required for production-relevant features:
 Before release:
 
 - all Definition-of-Done fields for the mode's profile are satisfied **with evidence**
-- validator passes: `node tools/validate-work-item.js <WORK_ITEM_ID>`
+- validator passes: `python tools/validate_work_item.py <WORK_ITEM_ID> --root .`
 - tests pass (new + regression) with pasted evidence
 - self-review gate passed
 - reviews are complete

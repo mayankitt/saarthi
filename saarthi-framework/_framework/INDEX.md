@@ -26,9 +26,10 @@ which file owns a rule, so you load only what you need (token discipline).
 | Work item lifecycle | `_framework/12-work-item-lifecycle-policy.md` |
 | **Execution & verification loop (do/verify/prove)** | `_framework/13-execution-verification-loop.md` |
 | **Autonomy dial + operational safety** | `_framework/14-autonomy-and-safety.md` |
-| **Multi-agent execution + spawning** | `_framework/15-multi-agent-orchestration.md` |
+| **Multi-agent execution + spawning + fallback levels** | `_framework/15-multi-agent-orchestration.md` |
 | **Adaptive learning + self-evolution** | `_framework/16-adaptive-learning.md` |
 | **MCP tool discovery + self-install** | `_framework/17-mcp-tool-discovery.md` |
+| **Saarthi observability & debug log** | `_framework/18-saarthi-observability.md` |
 | Knowledge-base retrieval | `knowledge-base/INDEX.md` |
 
 When prose disagrees with `framework.config.yaml`, the config wins.
@@ -51,7 +52,8 @@ Everything else is detail to load on demand via this index.
 
 ## Load-on-demand order (per phase)
 
-- **Intake/clarification:** 00, 03, 11, 12, 16 (apply known preferences) + `knowledge-base/INDEX.md` + `agent_context` from `framework.config.yaml` (load host agent identity for tool discovery qualification)
+- **Intake/clarification:** 00, 03, 11, 12, 16 (apply known preferences), 18 (start debug log) + `knowledge-base/INDEX.md` + `agent_context` from `framework.config.yaml` (load host agent identity for tool discovery qualification)
+- **Orchestration selection:** 15 + `environment_profiles` and `orchestration` from `framework.config.yaml`; optionally run capability probe (tools/run_capability_probe.py) and emit `probe_result` event
 - **Design:** 01, 02, 04, 05 (design gate), 07, 08
 - **Development:** 13, 14, 05 (dev gate), `framework.config.yaml` verification
 - **QA/Release:** 05 (release gate), 13 (evidence), test-plan artifact
